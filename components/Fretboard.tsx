@@ -178,7 +178,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 
         <div
           ref={scrollContainerRef}
-          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl border-4 border-[#2a1b12] shadow-2xl relative"
+          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl  shadow-2xl relative"
         >
           <div className="flex justify-center pb-24 min-h-full">
 

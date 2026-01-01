@@ -149,64 +149,64 @@ const Controls: React.FC<ControlsProps> = ({
                 </button>
             </div>
 
-            {/* Settings Panel */}
-            {showSettings && (
-                <div className="z-10 bg-[#120c08] p-4 border-b border-[#e6c190]/10 grid grid-cols-2 gap-4 text-xs animate-slide-down">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#888] font-bold uppercase tracking-wider">Tuning</label>
-                        <select
-                            value={tuning.name}
-                            onChange={(e) => onTuningChange(TUNINGS.find(t => t.name === e.target.value) || TUNINGS[0])}
-                            className="bg-[#2a1b12] text-[#e6c190] border border-[#3a2216] rounded p-2 outline-none"
-                        >
-                            {TUNINGS.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#888] font-bold uppercase tracking-wider">Capo</label>
-                        <select
-                            value={capo}
-                            onChange={(e) => onCapoChange(Number(e.target.value))}
-                            className="bg-[#2a1b12] text-[#e6c190] border border-[#3a2216] rounded p-2 outline-none"
-                        >
-                            {CAPO_POSITIONS.map(p => <option key={p} value={p}>{p === 0 ? '- None -' : `Fret ${p}`}</option>)}
-                        </select>
-                    </div>
-                    <div className="flex items-center gap-2 col-span-2 pt-2">
-                        <input
-                            type="checkbox"
-                            id="lefty"
-                            checked={isLefty}
-                            onChange={(e) => onLeftyChange(e.target.checked)}
-                            className="accent-[#e6c190]"
-                        />
-                        <label htmlFor="lefty" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Lefty Mode</label>
-                    </div>
-                    <div className="flex items-center gap-2 col-span-2">
-                        <input
-                            type="checkbox"
-                            id="showScale"
-                            checked={showAllNotes}
-                            onChange={(e) => onShowAllNotesChange(e.target.checked)}
-                            className="accent-[#e6c190]"
-                        />
-                        <label htmlFor="showScale" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Scale</label>
-                    </div>
-                    <div className="flex items-center gap-2 col-span-2">
-                        <input
-                            type="checkbox"
-                            id="showIntervals"
-                            checked={showIntervals}
-                            onChange={(e) => onShowIntervalsChange(e.target.checked)}
-                            className="accent-[#e6c190]"
-                        />
-                        <label htmlFor="showIntervals" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Intervals</label>
-                    </div>
-                </div>
-            )}
-
             {/* Main Controls */}
             <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6 ${showSettings ? '' : 'hidden lg:block'}`}>
+
+                {/* Settings Panel */}
+                {showSettings && (
+                    <div className="bg-[#120c08] p-4 rounded-lg border border-[#e6c190]/10 grid grid-cols-2 gap-4 text-xs animate-slide-down mb-4">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[#888] font-bold uppercase tracking-wider">Tuning</label>
+                            <select
+                                value={tuning.name}
+                                onChange={(e) => onTuningChange(TUNINGS.find(t => t.name === e.target.value) || TUNINGS[0])}
+                                className="bg-[#2a1b12] text-[#e6c190] border border-[#3a2216] rounded p-2 outline-none"
+                            >
+                                {TUNINGS.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[#888] font-bold uppercase tracking-wider">Capo</label>
+                            <select
+                                value={capo}
+                                onChange={(e) => onCapoChange(Number(e.target.value))}
+                                className="bg-[#2a1b12] text-[#e6c190] border border-[#3a2216] rounded p-2 outline-none"
+                            >
+                                {CAPO_POSITIONS.map(p => <option key={p} value={p}>{p === 0 ? '- None -' : `Fret ${p}`}</option>)}
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2 col-span-2 pt-2">
+                            <input
+                                type="checkbox"
+                                id="lefty"
+                                checked={isLefty}
+                                onChange={(e) => onLeftyChange(e.target.checked)}
+                                className="accent-[#e6c190]"
+                            />
+                            <label htmlFor="lefty" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Lefty Mode</label>
+                        </div>
+                        <div className="flex items-center gap-2 col-span-2">
+                            <input
+                                type="checkbox"
+                                id="showScale"
+                                checked={showAllNotes}
+                                onChange={(e) => onShowAllNotesChange(e.target.checked)}
+                                className="accent-[#e6c190]"
+                            />
+                            <label htmlFor="showScale" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Scale</label>
+                        </div>
+                        <div className="flex items-center gap-2 col-span-2">
+                            <input
+                                type="checkbox"
+                                id="showIntervals"
+                                checked={showIntervals}
+                                onChange={(e) => onShowIntervalsChange(e.target.checked)}
+                                className="accent-[#e6c190]"
+                            />
+                            <label htmlFor="showIntervals" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Intervals</label>
+                        </div>
+                    </div>
+                )}
 
                 {/* Root Picker */}
                 <div className="space-y-1 lg:space-y-2">
