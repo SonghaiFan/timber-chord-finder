@@ -132,22 +132,24 @@ const Controls: React.FC<ControlsProps> = ({
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10 pointer-events-none" />
 
             {/* Header & Settings Toggle */}
-            <div className="flex items-center justify-between z-10 border-b border-[#e6c190]/10 p-4 bg-[#1a110b]/50">
+            <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="w-full flex items-center justify-between z-10 border-b border-[#e6c190]/10 p-4 bg-[#1a110b]/50 hover:bg-[#1a110b]/70 transition-colors text-left outline-none"
+            >
                 <div>
                     <h1 className="text-xl font-bold text-[#e6c190] uppercase tracking-tighter leading-none font-sans">
                         AxeGrain
                     </h1>
                     <span className="text-[10px] text-[#c29b6d] tracking-widest uppercase">Chord Finder</span>
                 </div>
-                <button
-                    onClick={() => setShowSettings(!showSettings)}
-                    className={`p-2 rounded hover:bg-[#3a2216] transition-colors ${showSettings ? 'text-[#e6c190] bg-[#3a2216]' : 'text-[#c29b6d]'}`}
+                <div
+                    className={`p-2 rounded transition-colors ${showSettings ? 'text-[#e6c190] bg-[#3a2216]' : 'text-[#c29b6d]'}`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                </button>
-            </div>
+                </div>
+            </button>
 
             {/* Main Controls */}
             <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6 ${showSettings ? 'animate-slide-down' : 'hidden lg:block'}`}>
