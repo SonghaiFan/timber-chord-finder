@@ -290,8 +290,8 @@ const Fretboard: React.FC<FretboardProps> = ({
                         transform: 'translate(-50%, -50%)'
                       }}
                     >
-                      <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center shadow-sm backdrop-blur-[1px] border border-white/10">
-                        <span className="text-[9px] font-bold text-white/60">{getNoteName(pitch)}</span>
+                      <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
+                        <span className="text-[9px] font-bold text-[#555]">{getNoteName(pitch)}</span>
                       </div>
                     </div>
                   );
@@ -362,12 +362,15 @@ const Fretboard: React.FC<FretboardProps> = ({
                     }}
                   >
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-sm"
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${isRoot ? 'z-10 scale-110' : ''}`}
                       style={{
-                        backgroundColor: 'rgba(20, 20, 20, 0.5)'
+                        backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
+                        borderColor: isRoot ? '#e6c190' : '#c29b6d',
+                        color: '#2a1b12',
+                        boxShadow: isRoot ? '0 0 15px rgba(230,193,144,0.4)' : '0 0 10px rgba(194,155,109,0.4)'
                       }}
                     >
-                      <span className="text-white font-bold text-xs drop-shadow-sm">{noteName}</span>
+                      <span className="font-bold text-xs">{noteName}</span>
                     </div>
                   </div>
                 );
@@ -388,15 +391,17 @@ const Fretboard: React.FC<FretboardProps> = ({
                     transform: 'translate(-50%, -50%)'
                   }}>
                   <div
-                    className="relative w-full h-full rounded-full flex items-center justify-center backdrop-blur-sm shadow-md transition-transform duration-200"
+                    className="relative w-full h-full rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 border"
                     style={{
-                      backgroundColor: isRoot
-                        ? 'rgba(245, 158, 11, 0.5)' // Brighter for root
-                        : 'rgba(20, 20, 20, 0.5)', // Dark glass
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                      backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
+                      borderColor: isRoot ? '#e6c190' : '#c29b6d',
+                      color: '#2a1b12',
+                      boxShadow: isRoot
+                        ? '0 0 15px rgba(230,193,144,0.4)'
+                        : '0 0 10px rgba(194,155,109,0.4)',
                     }}
                   >
-                    <span className="font-bold font-sans text-lg z-10 leading-none text-white drop-shadow-sm">
+                    <span className="font-bold font-sans text-lg z-10 leading-none">
                       {noteName}
                     </span>
                   </div>
