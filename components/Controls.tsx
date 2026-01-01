@@ -178,10 +178,10 @@ const Controls: React.FC<ControlsProps> = ({
             )}
 
             {/* Main Controls */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6">
 
                 {/* Root Picker */}
-                <div className="space-y-2">
+                <div className="space-y-1 lg:space-y-2">
                     <div className="flex justify-between items-center px-1">
                         <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Root</span>
                         <span className="text-xs font-bold text-[#e6c190] bg-[#1a110b] px-3 py-1 rounded-md border border-[#3a2216]">{selectedRoot}</span>
@@ -195,7 +195,7 @@ const Controls: React.FC<ControlsProps> = ({
                         <div
                             ref={rootContainerRef}
                             onScroll={(e) => handleScroll(e, ROOTS, onRootChange, selectedRoot, rootScrollTimeout)}
-                            className="flex overflow-x-auto snap-x snap-mandatory gap-4 py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
+                            className="flex overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
                         >
                             {ROOTS.map((root) => (
                                 <button
@@ -203,10 +203,10 @@ const Controls: React.FC<ControlsProps> = ({
                                     data-active={selectedRoot === root}
                                     onClick={() => onRootChange(root)}
                                     className={`
-                        snap-center flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 ease-out border relative
+                        snap-center flex-shrink-0 w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center rounded-full transition-all duration-300 ease-out border relative
                         ${selectedRoot === root
-                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] scale-110 font-bold text-xl z-10'
-                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-sm opacity-50 hover:opacity-100'}
+                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] scale-110 font-bold text-lg lg:text-xl z-10'
+                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-xs lg:text-sm opacity-50 hover:opacity-100'}
                         `}
                                 >
                                     {root}
@@ -217,7 +217,7 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
 
                 {/* Quality Picker */}
-                <div className="space-y-2">
+                <div className="space-y-1 lg:space-y-2">
                     <div className="flex justify-between items-center px-1">
                         <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Quality</span>
                         <span className="text-xs font-bold text-[#e6c190] bg-[#1a110b] px-3 py-1 rounded-md border border-[#3a2216] truncate max-w-[150px]">{selectedQuality.name}</span>
@@ -229,7 +229,7 @@ const Controls: React.FC<ControlsProps> = ({
                         <div
                             ref={qualityContainerRef}
                             onScroll={(e) => handleScroll(e, CHORD_TYPES, onQualityChange, selectedQuality, qualityScrollTimeout, 'id')}
-                            className="flex overflow-x-auto snap-x snap-mandatory gap-4 py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
+                            className="flex overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
                         >
                             {CHORD_TYPES.map((q) => (
                                 <button
@@ -237,10 +237,10 @@ const Controls: React.FC<ControlsProps> = ({
                                     data-active={selectedQuality.id === q.id}
                                     onClick={() => onQualityChange(q)}
                                     className={`
-                            snap-center flex-shrink-0 px-4 py-2 rounded-lg transition-all duration-300 ease-out whitespace-nowrap border
+                            snap-center flex-shrink-0 px-3 py-1 lg:px-4 lg:py-2 rounded-lg transition-all duration-300 ease-out whitespace-nowrap border
                             ${selectedQuality.id === q.id
-                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] font-bold text-sm scale-110 z-10'
-                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-xs opacity-50 hover:opacity-100'}
+                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] font-bold text-xs lg:text-sm scale-110 z-10'
+                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-[10px] lg:text-xs opacity-50 hover:opacity-100'}
                         `}
                                 >
                                     {q.suffix || q.name}
@@ -251,7 +251,7 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
 
                 {/* Slash Chord Toggle/Picker */}
-                <div className="space-y-2">
+                <div className="space-y-1 lg:space-y-2">
                     <button
                         onClick={() => {
                             if (showBass) {
@@ -261,7 +261,7 @@ const Controls: React.FC<ControlsProps> = ({
                                 setShowBass(true);
                             }
                         }}
-                        className={`w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300 ${showBass ? 'bg-[#3a2216] border-[#e6c190] text-[#e6c190] shadow-lg' : 'bg-[#1a110b]/40 border-[#3a2216] text-[#c29b6d] hover:bg-[#2a1b12]'
+                        className={`w-full flex justify-between items-center px-3 py-2 lg:px-4 lg:py-3 rounded-xl border transition-all duration-300 ${showBass ? 'bg-[#3a2216] border-[#e6c190] text-[#e6c190] shadow-lg' : 'bg-[#1a110b]/40 border-[#3a2216] text-[#c29b6d] hover:bg-[#2a1b12]'
                             }`}
                     >
                         <span className="text-xs font-bold uppercase tracking-wide">Slash Bass / Inversion</span>
@@ -276,7 +276,7 @@ const Controls: React.FC<ControlsProps> = ({
                             <div
                                 ref={bassContainerRef}
                                 onScroll={(e) => handleScroll(e, ROOTS, onBassChange, selectedBass, bassScrollTimeout)}
-                                className="flex overflow-x-auto snap-x snap-mandatory gap-4 py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
+                                className="flex overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
                             >
                                 {ROOTS.map((root) => (
                                     <button
@@ -284,10 +284,10 @@ const Controls: React.FC<ControlsProps> = ({
                                         data-active={selectedBass === root}
                                         onClick={() => onBassChange(root)}
                                         className={`
-                            snap-center flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ease-out border
+                            snap-center flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center rounded-full transition-all duration-300 ease-out border
                             ${selectedBass === root
-                                                ? 'bg-[#c29b6d] text-[#1a110b] border-[#c29b6d] scale-110 font-bold text-lg z-10 shadow-[0_0_15px_rgba(194,155,109,0.4)]'
-                                                : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-xs opacity-50 hover:opacity-100'}
+                                                ? 'bg-[#c29b6d] text-[#1a110b] border-[#c29b6d] scale-110 font-bold text-base lg:text-lg z-10 shadow-[0_0_15px_rgba(194,155,109,0.4)]'
+                                                : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-[10px] lg:text-xs opacity-50 hover:opacity-100'}
                             `}
                                     >
                                         {root}
@@ -299,33 +299,39 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
 
                 {/* Variations List */}
-                <div className="flex-1 min-h-[150px] flex flex-col gap-3">
-                    <div className="flex justify-between items-baseline border-b border-[#3a2216] pb-2 mt-4">
+                <div className="flex-1 min-h-[100px] lg:min-h-[150px] flex flex-col gap-1 lg:gap-3">
+                    <div className="flex justify-between items-baseline border-b border-[#3a2216] pb-2 mt-2 lg:mt-4">
                         <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Variations ({variations.length})</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[300px] pr-1 custom-scrollbar pb-2">
+                    <div className="grid grid-cols-5 lg:grid-cols-2 gap-2 overflow-y-auto max-h-[150px] lg:max-h-[300px] pr-1 custom-scrollbar pb-2">
                         {variations.length === 0 ? (
-                            <div className="col-span-2 text-center text-[#666] text-xs py-8 italic">No variations found.</div>
+                            <div className="col-span-5 lg:col-span-2 text-center text-[#666] text-xs py-8 italic">No variations found.</div>
                         ) : (
                             variations.map((v, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => onVariationSelect(idx)}
                                     className={`
-                                text-left px-4 py-3 rounded-lg border transition-all duration-200 group relative overflow-hidden
+                                text-left px-0 py-2 lg:px-4 lg:py-3 rounded-lg border transition-all duration-200 group relative overflow-hidden flex items-center justify-center lg:block
                                 ${variationIndex === idx
                                             ? 'bg-[#e6c190] border-[#e6c190] text-[#2a1b12] shadow-lg'
                                             : 'bg-[#1a110b]/40 border-[#3a2216] text-[#888] hover:border-[#6b4e3d] hover:bg-[#2a1b12]'}
                             `}
                                 >
-                                    <div className="flex justify-between items-center mb-1">
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${variationIndex === idx ? 'text-[#2a1b12]' : 'text-[#666] group-hover:text-[#c29b6d]'}`}>
-                                            Var {idx + 1}
-                                        </span>
-                                        {variationIndex === idx && <span className="w-1.5 h-1.5 rounded-full bg-[#2a1b12]"></span>}
-                                    </div>
-                                    <div className={`font-mono text-sm tracking-widest ${variationIndex === idx ? 'font-bold' : ''}`}>
-                                        {formatVariation(v)}
+                                    {/* Mobile: Simple Number */}
+                                    <span className="lg:hidden text-sm font-bold">{idx + 1}</span>
+
+                                    {/* Desktop: Full Details */}
+                                    <div className="hidden lg:block">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${variationIndex === idx ? 'text-[#2a1b12]' : 'text-[#666] group-hover:text-[#c29b6d]'}`}>
+                                                Var {idx + 1}
+                                            </span>
+                                            {variationIndex === idx && <span className="w-1.5 h-1.5 rounded-full bg-[#2a1b12]"></span>}
+                                        </div>
+                                        <div className={`font-mono text-sm tracking-widest ${variationIndex === idx ? 'font-bold' : ''}`}>
+                                            {formatVariation(v)}
+                                        </div>
                                     </div>
                                 </button>
                             ))
@@ -334,20 +340,6 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
 
             </div>
-
-            <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3a2216; border-radius: 2px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-down { animation: slideDown 0.2s ease-out; }
-        .animate-fade-in { animation: slideDown 0.3s ease-out; }
-      `}</style>
         </div>
     );
 };

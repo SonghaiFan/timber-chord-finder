@@ -11,11 +11,11 @@ const App: React.FC = () => {
   const [root, setRoot] = useState<RootNote>('C');
   const [quality, setQuality] = useState<ChordType>(CHORD_TYPES[0]); // Default to Major
   const [bass, setBass] = useState<RootNote>('C'); // Slash chord bass
-  
+
   const [tuning, setTuning] = useState<TuningDefinition>(TUNINGS[0]);
   const [capo, setCapo] = useState<number>(0);
   const [isLefty, setIsLefty] = useState<boolean>(false);
-  
+
   const [variationIndex, setVariationIndex] = useState(0);
 
   // Sync Bass with Root initially or when user explicitly changes root (optional UX choice)
@@ -40,28 +40,22 @@ const App: React.FC = () => {
 
   return (
     <div className="fixed inset-0 w-full h-full bg-[#120c08] flex items-center justify-center p-2 lg:p-8 font-sans text-[#e6c190] overflow-hidden">
-      
-      <style>{`
-        @keyframes popIn {
-          0% { transform: translate(-50%, -50%) scale(0); }
-          60% { transform: translate(-50%, -50%) scale(1.1); }
-          100% { transform: translate(-50%, -50%) scale(1); }
-        }
-        .animate-pop-in {
-          animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-      `}</style>
 
       <WoodGrain />
 
+      {/* Footer Credit */}
+      <div className="absolute bottom-2 right-4 z-50 text-[10px] text-[#c29b6d]/40 font-mono pointer-events-none select-none">
+        Made by Songhai Fan
+      </div>
+
       {/* Main Container */}
       <div className="relative z-10 w-full max-w-6xl h-full flex flex-col lg:flex-row gap-2 lg:gap-8">
-        
+
         {/* Left Column: Controls */}
         {/* Mobile: Constrained height to allow fretboard to show. Desktop: Full height. */}
         <div className="flex-shrink-0 w-full lg:w-[360px] max-h-[45vh] lg:max-h-full lg:h-full flex flex-col min-h-0 transition-all duration-300">
-          <Controls 
-            selectedRoot={root} 
+          <Controls
+            selectedRoot={root}
             selectedQuality={quality}
             selectedBass={bass}
             tuning={tuning}
@@ -69,7 +63,7 @@ const App: React.FC = () => {
             isLefty={isLefty}
             variations={variations}
             variationIndex={variationIndex}
-            onRootChange={setRoot} 
+            onRootChange={setRoot}
             onQualityChange={setQuality}
             onBassChange={setBass}
             onTuningChange={setTuning}
@@ -78,10 +72,10 @@ const App: React.FC = () => {
             onVariationSelect={setVariationIndex}
           />
         </div>
-        
+
         {/* Right Column: Fretboard */}
         <div className="flex-1 min-h-0 flex flex-col">
-          <Fretboard 
+          <Fretboard
             chordName={displayName}
             formula={quality.formula}
             variation={currentVariation}
