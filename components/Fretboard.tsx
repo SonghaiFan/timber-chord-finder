@@ -116,12 +116,6 @@ const Fretboard: React.FC<FretboardProps> = ({
                 Capo {capo}
               </div>
             )}
-            <button
-              onClick={() => setShowAllNotes(!showAllNotes)}
-              className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded border border-[#2a1b12]/20 hover:bg-[#2a1b12]/5 transition-colors text-[#2a1b12]"
-            >
-              {showAllNotes ? 'Hide Scale' : 'Show Scale'}
-            </button>
           </div>
         </div>
 
