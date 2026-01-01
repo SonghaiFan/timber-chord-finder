@@ -157,20 +157,20 @@ const Fretboard: React.FC<FretboardProps> = ({
           <>
             <button
               onClick={() => onVariationChange((variationIndex - 1 + totalVariations) % totalVariations)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-50 p-4 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-0 group-hover/board:opacity-100 focus:opacity-100 lg:opacity-100 outline-none"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-50 p-2 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-100 lg:opacity-0 lg:group-hover/board:opacity-100 focus:opacity-100 outline-none"
               aria-label="Previous Variation"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button
               onClick={() => onVariationChange((variationIndex + 1) % totalVariations)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-50 p-4 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-0 group-hover/board:opacity-100 focus:opacity-100 lg:opacity-100 outline-none"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-50 p-2 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-100 lg:opacity-0 lg:group-hover/board:opacity-100 focus:opacity-100 outline-none"
               aria-label="Next Variation"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </>
