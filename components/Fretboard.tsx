@@ -12,7 +12,10 @@ interface FretboardProps {
   capo: number;
   isLefty: boolean;
   showAllNotes: boolean;
+  showIntervals: boolean;
 }
+
+const INTERVAL_NAMES = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7"];
 
 const Fretboard: React.FC<FretboardProps> = ({
   chordName,
@@ -21,27 +24,36 @@ const Fretboard: React.FC<FretboardProps> = ({
   tuning,
   capo,
   isLefty,
-  showAllNotes
+  showAllNotes,
+  showIntervals
 }) => {
   // Calculate target notes (pitch classes)
-  const targetNotes = useMemo(() => {
-    if (!chordName) return new Set<number>();
+  const { targetNotes, rootVal } = useMemo(() => {
+    if (!chordName) return { targetNotes: new Set<number>(), rootVal: 0 };
 
     const rootStr = chordName.split(' ')[0];
-    const rootVal = getNoteValue(rootStr);
+    const rVal = getNoteValue(rootStr);
 
     // Find chord type by formula
     const chordType = CHORD_TYPES.find(c => c.formula === formula);
 
-    if (!chordType) return new Set<number>();
+    if (!chordType) return { targetNotes: new Set<number>(), rootVal: rVal };
 
     const notes = new Set<number>();
     chordType.intervals.forEach(interval => {
-      notes.add((rootVal + interval) % 12);
+      notes.add((rVal + interval) % 12);
     });
 
-    return notes;
+    return { targetNotes: notes, rootVal: rVal };
   }, [chordName, formula]);
+
+  const getNoteLabel = (pitch: number) => {
+    if (showIntervals) {
+      const interval = (pitch - rootVal + 12) % 12;
+      return INTERVAL_NAMES[interval];
+    }
+    return getNoteName(pitch);
+  };
 
   // Config for Vertical Fretboard
   const totalFrets = 22;
@@ -285,7 +297,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       }}
                     >
                       <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
-                        <span className="text-[9px] font-bold text-[#555]">{getNoteName(pitch)}</span>
+                        <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
                       </div>
                     </div>
                   );
@@ -315,9 +327,9 @@ const Fretboard: React.FC<FretboardProps> = ({
               const xPos = getStringX(stringIdx);
               // Pitch calculation
               const pitch = tuning.offsets[stringIdx] + capo + (fret === -1 ? 0 : fret);
-              const noteName = getNoteName(pitch);
+              const noteName = getNoteLabel(pitch);
               const rootName = chordName.split(' ')[0];
-              const isRoot = noteName === rootName;
+              const isRoot = (pitch % 12) === rootVal; // Better root check using value
 
               // Logic for handling position with Capo
               // Engine returns fret relative to Capo (0 = open at capo).

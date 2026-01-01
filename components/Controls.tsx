@@ -11,6 +11,7 @@ interface ControlsProps {
     capo: number;
     isLefty: boolean;
     showAllNotes: boolean;
+    showIntervals: boolean;
     variations: number[][];
     variationIndex: number;
     onRootChange: (root: RootNote) => void;
@@ -20,6 +21,7 @@ interface ControlsProps {
     onCapoChange: (capo: number) => void;
     onLeftyChange: (isLefty: boolean) => void;
     onShowAllNotesChange: (show: boolean) => void;
+    onShowIntervalsChange: (show: boolean) => void;
     onVariationSelect: (index: number) => void;
 }
 
@@ -31,6 +33,7 @@ const Controls: React.FC<ControlsProps> = ({
     capo,
     isLefty,
     showAllNotes,
+    showIntervals,
     variations,
     variationIndex,
     onRootChange,
@@ -40,6 +43,7 @@ const Controls: React.FC<ControlsProps> = ({
     onCapoChange,
     onLeftyChange,
     onShowAllNotesChange,
+    onShowIntervalsChange,
     onVariationSelect
 }) => {
     const rootContainerRef = useRef<HTMLDivElement>(null);
@@ -187,6 +191,16 @@ const Controls: React.FC<ControlsProps> = ({
                             className="accent-[#e6c190]"
                         />
                         <label htmlFor="showScale" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Scale</label>
+                    </div>
+                    <div className="flex items-center gap-2 col-span-2">
+                        <input
+                            type="checkbox"
+                            id="showIntervals"
+                            checked={showIntervals}
+                            onChange={(e) => onShowIntervalsChange(e.target.checked)}
+                            className="accent-[#e6c190]"
+                        />
+                        <label htmlFor="showIntervals" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Intervals</label>
                     </div>
                 </div>
             )}

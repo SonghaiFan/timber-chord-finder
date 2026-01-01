@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [capo, setCapo] = useState<number>(0);
   const [isLefty, setIsLefty] = useState<boolean>(false);
   const [showAllNotes, setShowAllNotes] = useState<boolean>(false);
+  const [showIntervals, setShowIntervals] = useState<boolean>(false);
 
   const [variationIndex, setVariationIndex] = useState(0);
 
@@ -72,6 +73,8 @@ const App: React.FC = () => {
             onCapoChange={setCapo}
             onLeftyChange={setIsLefty}
             onShowAllNotesChange={setShowAllNotes}
+            showIntervals={showIntervals}
+            onShowIntervalsChange={setShowIntervals}
             onVariationSelect={setVariationIndex}
           />
         </div>
@@ -86,6 +89,7 @@ const App: React.FC = () => {
             capo={capo}
             isLefty={isLefty}
             showAllNotes={showAllNotes}
+            showIntervals={showIntervals}
           />
         </div>
 
