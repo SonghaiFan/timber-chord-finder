@@ -206,7 +206,7 @@ const Controls: React.FC<ControlsProps> = ({
             )}
 
             {/* Main Controls */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6">
+            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6 ${showSettings ? '' : 'hidden lg:block'}`}>
 
                 {/* Root Picker */}
                 <div className="space-y-1 lg:space-y-2">
@@ -327,11 +327,11 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
 
                 {/* Variations List */}
-                <div className="flex-1 min-h-[100px] lg:min-h-[150px] flex flex-col gap-1 lg:gap-3">
+                <div className="flex-1 min-h-[100px] lg:min-h-0 flex flex-col gap-1 lg:gap-3">
                     <div className="flex justify-between items-baseline border-b border-[#3a2216] pb-2 mt-2 lg:mt-4">
                         <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Variations ({variations.length})</span>
                     </div>
-                    <div className="grid grid-cols-5 lg:grid-cols-2 gap-2 overflow-y-auto max-h-[150px] lg:max-h-[300px] pr-1 custom-scrollbar pb-2">
+                    <div className="grid grid-cols-5 lg:grid-cols-2 gap-2 overflow-y-auto max-h-[150px] lg:max-h-none lg:flex-1 pr-1 custom-scrollbar pb-2">
                         {variations.length === 0 ? (
                             <div className="col-span-5 lg:col-span-2 text-center text-[#666] text-xs py-8 italic">No variations found.</div>
                         ) : (

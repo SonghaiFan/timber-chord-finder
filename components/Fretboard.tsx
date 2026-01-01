@@ -13,6 +13,9 @@ interface FretboardProps {
   isLefty: boolean;
   showAllNotes: boolean;
   showIntervals: boolean;
+  variationIndex: number;
+  totalVariations: number;
+  onVariationChange: (index: number) => void;
 }
 
 const INTERVAL_NAMES = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7"];
@@ -25,7 +28,10 @@ const Fretboard: React.FC<FretboardProps> = ({
   capo,
   isLefty,
   showAllNotes,
-  showIntervals
+  showIntervals,
+  variationIndex,
+  totalVariations,
+  onVariationChange
 }) => {
   // Calculate target notes (pitch classes)
   const { targetNotes, rootVal } = useMemo(() => {
@@ -114,7 +120,7 @@ const Fretboard: React.FC<FretboardProps> = ({
     <div className="flex flex-col h-full w-full max-w-md mx-auto lg:max-w-none">
 
       {/* Info Panel */}
-      <div className="mb-2 p-3 bg-[#fdfbf7] border-2 border-[#1a110b] rounded-lg shadow-lg flex flex-col gap-2 text-[#1a110b] relative overflow-hidden flex-shrink-0 z-20">
+      <div className="hidden lg:flex mb-2 p-3 bg-[#fdfbf7] border-2 border-[#1a110b] rounded-lg shadow-lg flex-col gap-2 text-[#1a110b] relative overflow-hidden flex-shrink-0 z-20">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] pointer-events-none" />
 
         <div className="relative z-10 flex justify-between items-start">
@@ -143,278 +149,305 @@ const Fretboard: React.FC<FretboardProps> = ({
         </div>
       </div>
 
-      {/* Fretboard Scroll Container */}
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl border-4 border-[#2a1b12] shadow-2xl relative"
-      >
-        <div className="flex justify-center pb-24 min-h-full">
+      {/* Fretboard Container with Arrows */}
+      <div className="flex-1 relative min-h-0 group/board">
 
-          {/* The Guitar Neck */}
-          <div
-            className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none rounded-b-lg overflow-hidden"
-            style={{
-              width: `${boardWidth}px`,
-              height: `${boardHeight + headstockHeight}px`,
-              background: 'linear-gradient(90deg, #3a2216 0%, #5a3a29 50%, #3a2216 100%)'
-            }}
-          >
-            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay pointer-events-none" />
-
-            {/* Headstock Area */}
-            <div
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-10 border-b-4 border-[#1a110b]"
-              style={{ height: `${headstockHeight}px` }}
+        {/* Navigation Arrows */}
+        {totalVariations > 1 && (
+          <>
+            <button
+              onClick={() => onVariationChange((variationIndex - 1 + totalVariations) % totalVariations)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-50 p-4 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-0 group-hover/board:opacity-100 focus:opacity-100 lg:opacity-100 outline-none"
+              aria-label="Previous Variation"
             >
-              <div className="absolute bottom-0 left-0 right-0 h-[14px] bg-gradient-to-b from-[#f4f1ea] to-[#dcd8cc] border-b border-[#999] shadow-md z-20" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => onVariationChange((variationIndex + 1) % totalVariations)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-50 p-4 text-[#e6c190]/50 hover:text-[#e6c190] hover:scale-110 transition-all opacity-0 group-hover/board:opacity-100 focus:opacity-100 lg:opacity-100 outline-none"
+              aria-label="Next Variation"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
 
-              {stringNames.map((name, i) => (
-                <span
-                  key={`label-${i}`}
-                  className="absolute bottom-5 text-[10px] font-mono font-bold text-[#8b6520] text-center w-6 -ml-3 drop-shadow-md"
-                  style={{ left: `${getStringX(i)}px` }}
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
+        <div
+          ref={scrollContainerRef}
+          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl border-4 border-[#2a1b12] shadow-2xl relative"
+        >
+          <div className="flex justify-center pb-24 min-h-full">
 
-            {/* Fret Lines */}
-            {Array.from({ length: totalFrets }).map((_, i) => {
-              const fretNum = i + 1;
-              const topY = getFretY(fretNum);
+            {/* The Guitar Neck */}
+            <div
+              className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none rounded-b-lg overflow-hidden"
+              style={{
+                width: `${boardWidth}px`,
+                height: `${boardHeight + headstockHeight}px`,
+                background: 'linear-gradient(90deg, #3a2216 0%, #5a3a29 50%, #3a2216 100%)'
+              }}
+            >
+              <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay pointer-events-none" />
 
-              return (
-                <React.Fragment key={`fret-${fretNum}`}>
-                  <div
-                    className="absolute left-0 right-0 h-[4px] z-10 shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-                    style={{
-                      top: `${topY}px`,
-                      background: 'linear-gradient(180deg, #888 0%, #fff 40%, #ccc 60%, #444 100%)',
-                      borderRadius: '2px'
-                    }}
-                  />
-
-                  {/* Fret Number */}
-                  <span
-                    className={`absolute text-xs text-[#c29b6d] font-mono font-bold opacity-50 w-8 text-right flex items-center justify-end`}
-                    style={{
-                      top: `${topY - (fretSpacing / 2) - 8}px`,
-                      height: '16px',
-                      [isLefty ? 'right' : 'left']: '-40px'
-                    }}
-                  >
-                    {fretNum}
-                  </span>
-
-                  {/* Inlay Dots */}
-                  {[3, 5, 7, 9, 15, 17, 19].includes(fretNum) && (
-                    <div
-                      className="absolute left-1/2 w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
-                      style={{
-                        top: `${topY - (fretSpacing / 2) + 25}px`,
-                        background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
-                        boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
-                      }}
-                    />
-                  )}
-                  {fretNum === 12 && (
-                    <>
-                      <div className="absolute left-[30%] w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
-                        style={{
-                          top: `${topY - (fretSpacing / 2) + 25}px`,
-                          background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
-                          boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
-                        }} />
-                      <div className="absolute right-[30%] w-5 h-5 rounded-full z-0 -mr-2.5 -mt-[25px]"
-                        style={{
-                          top: `${topY - (fretSpacing / 2) + 25}px`,
-                          background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
-                          boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
-                        }} />
-                    </>
-                  )}
-                </React.Fragment>
-              );
-            })}
-
-            {/* CAPO Visualization */}
-            {capo > 0 && (
+              {/* Headstock Area */}
               <div
-                className="absolute left-[-4px] right-[-4px] z-30 shadow-xl"
-                style={{
-                  top: `${getFretY(capo) - 32}px`, // Centered on the fret space just behind the wire
-                  height: '32px',
-                  background: 'linear-gradient(90deg, #111, #333 10%, #222 50%, #333 90%, #111)',
-                  borderRadius: '4px',
-                  borderBottom: '2px solid #000',
-                  boxShadow: '0 5px 10px rgba(0,0,0,0.6)'
-                }}
+                className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-10 border-b-4 border-[#1a110b]"
+                style={{ height: `${headstockHeight}px` }}
               >
-                {/* Capo details */}
-                <div className="absolute top-0 bottom-0 left-2 right-2 border-t border-white/10 rounded-sm"></div>
-                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-black/50 blur-[2px]"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-[14px] bg-gradient-to-b from-[#f4f1ea] to-[#dcd8cc] border-b border-[#999] shadow-md z-20" />
+
+                {stringNames.map((name, i) => (
+                  <span
+                    key={`label-${i}`}
+                    className="absolute bottom-5 text-[10px] font-mono font-bold text-[#8b6520] text-center w-6 -ml-3 drop-shadow-md"
+                    style={{ left: `${getStringX(i)}px` }}
+                  >
+                    {name}
+                  </span>
+                ))}
               </div>
-            )}
 
-            {/* All Chord Tones (Ghost Notes) */}
-            {showAllNotes && Array.from({ length: 6 }).map((_, stringIdx) => {
-              return Array.from({ length: totalFrets + 1 }).map((_, i) => {
-                const physicalFret = i; // 0..22
+              {/* Fret Lines */}
+              {Array.from({ length: totalFrets }).map((_, i) => {
+                const fretNum = i + 1;
+                const topY = getFretY(fretNum);
 
-                // Don't show notes behind the nut/capo if they aren't relevant?
-                // Actually, notes behind capo are not playable usually.
-                if (physicalFret < capo) return null;
-
-                const pitch = tuning.offsets[stringIdx] + physicalFret;
-                const noteVal = pitch % 12;
-
-                if (targetNotes.has(noteVal)) {
-                  // Check if this is already covered by variation
-                  // variation[stringIdx] is relative fret.
-                  // relative fret r corresponds to physical fret r + capo.
-                  // If variation is -1 (mute), we might still want to show the ghost note?
-                  // If variation is defined and matches this physical fret, don't show ghost.
-
-                  const isMainNote = variation && (variation[stringIdx] !== -1) && (variation[stringIdx] + capo === physicalFret);
-                  if (isMainNote) return null;
-
-                  const xPos = getStringX(stringIdx);
-                  let topY;
-                  if (physicalFret === 0) {
-                    topY = headstockHeight - 30;
-                  } else {
-                    topY = getFretY(physicalFret) - (fretSpacing / 2);
-                  }
-
-                  return (
-                    <div key={`ghost-${stringIdx}-${physicalFret}`}
-                      className="absolute w-6 h-6 z-30 flex items-center justify-center"
+                return (
+                  <React.Fragment key={`fret-${fretNum}`}>
+                    <div
+                      className="absolute left-0 right-0 h-[4px] z-10 shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
                       style={{
                         top: `${topY}px`,
-                        left: `${xPos}px`,
-                        transform: 'translate(-50%, -50%)'
+                        background: 'linear-gradient(180deg, #888 0%, #fff 40%, #ccc 60%, #444 100%)',
+                        borderRadius: '2px'
+                      }}
+                    />
+
+                    {/* Fret Number */}
+                    <span
+                      className={`absolute text-xs text-[#c29b6d] font-mono font-bold opacity-50 w-8 text-right flex items-center justify-end`}
+                      style={{
+                        top: `${topY - (fretSpacing / 2) - 8}px`,
+                        height: '16px',
+                        [isLefty ? 'right' : 'left']: '-40px'
                       }}
                     >
-                      <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
-                        <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
+                      {fretNum}
+                    </span>
+
+                    {/* Inlay Dots */}
+                    {[3, 5, 7, 9, 15, 17, 19].includes(fretNum) && (
+                      <div
+                        className="absolute left-1/2 w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
+                        style={{
+                          top: `${topY - (fretSpacing / 2) + 25}px`,
+                          background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
+                          boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
+                        }}
+                      />
+                    )}
+                    {fretNum === 12 && (
+                      <>
+                        <div className="absolute left-[30%] w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
+                          style={{
+                            top: `${topY - (fretSpacing / 2) + 25}px`,
+                            background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
+                            boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
+                          }} />
+                        <div className="absolute right-[30%] w-5 h-5 rounded-full z-0 -mr-2.5 -mt-[25px]"
+                          style={{
+                            top: `${topY - (fretSpacing / 2) + 25}px`,
+                            background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
+                            boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
+                          }} />
+                      </>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+
+              {/* CAPO Visualization */}
+              {capo > 0 && (
+                <div
+                  className="absolute left-[-4px] right-[-4px] z-30 shadow-xl"
+                  style={{
+                    top: `${getFretY(capo) - 32}px`, // Centered on the fret space just behind the wire
+                    height: '32px',
+                    background: 'linear-gradient(90deg, #111, #333 10%, #222 50%, #333 90%, #111)',
+                    borderRadius: '4px',
+                    borderBottom: '2px solid #000',
+                    boxShadow: '0 5px 10px rgba(0,0,0,0.6)'
+                  }}
+                >
+                  {/* Capo details */}
+                  <div className="absolute top-0 bottom-0 left-2 right-2 border-t border-white/10 rounded-sm"></div>
+                  <div className="absolute -bottom-1 left-0 right-0 h-1 bg-black/50 blur-[2px]"></div>
+                </div>
+              )}
+
+              {/* All Chord Tones (Ghost Notes) */}
+              {showAllNotes && Array.from({ length: 6 }).map((_, stringIdx) => {
+                return Array.from({ length: totalFrets + 1 }).map((_, i) => {
+                  const physicalFret = i; // 0..22
+
+                  // Don't show notes behind the nut/capo if they aren't relevant?
+                  // Actually, notes behind capo are not playable usually.
+                  if (physicalFret < capo) return null;
+
+                  const pitch = tuning.offsets[stringIdx] + physicalFret;
+                  const noteVal = pitch % 12;
+
+                  if (targetNotes.has(noteVal)) {
+                    // Check if this is already covered by variation
+                    // variation[stringIdx] is relative fret.
+                    // relative fret r corresponds to physical fret r + capo.
+                    // If variation is -1 (mute), we might still want to show the ghost note?
+                    // If variation is defined and matches this physical fret, don't show ghost.
+
+                    const isMainNote = variation && (variation[stringIdx] !== -1) && (variation[stringIdx] + capo === physicalFret);
+                    if (isMainNote) return null;
+
+                    const xPos = getStringX(stringIdx);
+                    let topY;
+                    if (physicalFret === 0) {
+                      topY = headstockHeight - 30;
+                    } else {
+                      topY = getFretY(physicalFret) - (fretSpacing / 2);
+                    }
+
+                    return (
+                      <div key={`ghost-${stringIdx}-${physicalFret}`}
+                        className="absolute w-6 h-6 z-30 flex items-center justify-center"
+                        style={{
+                          top: `${topY}px`,
+                          left: `${xPos}px`,
+                          transform: 'translate(-50%, -50%)'
+                        }}
+                      >
+                        <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
+                          <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                });
+              })}
+
+              {/* Strings */}
+              {stringNames.map((_, i) => (
+                <div
+                  key={`string-${i}`}
+                  className="absolute top-[80px] bottom-0 shadow-[2px_0_4px_rgba(0,0,0,0.6)] z-20 pointer-events-none"
+                  style={{
+                    left: `${getStringX(i)}px`,
+                    width: i < 3 ? '3px' : '1px',
+                    background: i < 3
+                      ? 'linear-gradient(90deg, #3d2b1f, #a88b7d 40%, #5e4030 100%)'
+                      : 'linear-gradient(90deg, #555, #fff 50%, #555)',
+                    marginLeft: i < 3 ? '-1.5px' : '-0.5px'
+                  }}
+                />
+              ))}
+
+              {/* Note Markers */}
+              {variation && variation.map((fret, stringIdx) => {
+                const xPos = getStringX(stringIdx);
+                // Pitch calculation
+                const pitch = tuning.offsets[stringIdx] + capo + (fret === -1 ? 0 : fret);
+                const noteName = getNoteLabel(pitch);
+                const rootName = chordName.split(' ')[0];
+                const isRoot = (pitch % 12) === rootVal; // Better root check using value
+
+                // Logic for handling position with Capo
+                // Engine returns fret relative to Capo (0 = open at capo).
+                // Absolute fret = fret + capo.
+                const absoluteFret = fret >= 0 ? fret + capo : -1;
+
+                // 1. Muted String (X)
+                if (fret === -1) {
+                  return (
+                    <div
+                      key={`marker-mute-${stringIdx}`}
+                      className="absolute flex items-center justify-center z-40"
+                      style={{
+                        top: `${headstockHeight - 65}px`,
+                        left: `${xPos}px`,
+                        marginLeft: '-16px',
+                        width: '32px'
+                      }}
+                    >
+                      <div className="text-[#cc4444] font-sans font-bold text-xl drop-shadow-[0_1px_1px_rgba(0,0,0,1)] opacity-80">✕</div>
+                    </div>
+                  );
+                }
+
+                // 2. Open String (No Capo)
+                if (absoluteFret === 0) {
+                  return (
+                    <div
+                      key={`marker-open-${stringIdx}`}
+                      className="absolute flex items-center justify-center z-40"
+                      style={{
+                        top: `${headstockHeight - 50}px`,
+                        left: `${xPos}px`,
+                        marginLeft: '-16px',
+                        width: '32px'
+                      }}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${isRoot ? 'z-10 scale-110' : ''}`}
+                        style={{
+                          backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
+                          borderColor: isRoot ? '#e6c190' : '#c29b6d',
+                          color: '#2a1b12',
+                          boxShadow: isRoot ? '0 0 15px rgba(230,193,144,0.4)' : '0 0 10px rgba(194,155,109,0.4)'
+                        }}
+                      >
+                        <span className="font-bold text-xs">{noteName}</span>
                       </div>
                     </div>
                   );
                 }
-                return null;
-              });
-            })}
 
-            {/* Strings */}
-            {stringNames.map((_, i) => (
-              <div
-                key={`string-${i}`}
-                className="absolute top-[80px] bottom-0 shadow-[2px_0_4px_rgba(0,0,0,0.6)] z-20 pointer-events-none"
-                style={{
-                  left: `${getStringX(i)}px`,
-                  width: i < 3 ? '3px' : '1px',
-                  background: i < 3
-                    ? 'linear-gradient(90deg, #3d2b1f, #a88b7d 40%, #5e4030 100%)'
-                    : 'linear-gradient(90deg, #555, #fff 50%, #555)',
-                  marginLeft: i < 3 ? '-1.5px' : '-0.5px'
-                }}
-              />
-            ))}
+                // 3. Fretted Note (includes "Open" at Capo)
+                const topWireY = getFretY(absoluteFret);
+                const centerY = topWireY - (fretSpacing / 2);
+                // If note is "at capo" (fret === 0 relative to capo), style might be different?
+                // For now, consistent styling. The dot sits ON the capo if fret=0.
 
-            {/* Note Markers */}
-            {variation && variation.map((fret, stringIdx) => {
-              const xPos = getStringX(stringIdx);
-              // Pitch calculation
-              const pitch = tuning.offsets[stringIdx] + capo + (fret === -1 ? 0 : fret);
-              const noteName = getNoteLabel(pitch);
-              const rootName = chordName.split(' ')[0];
-              const isRoot = (pitch % 12) === rootVal; // Better root check using value
-
-              // Logic for handling position with Capo
-              // Engine returns fret relative to Capo (0 = open at capo).
-              // Absolute fret = fret + capo.
-              const absoluteFret = fret >= 0 ? fret + capo : -1;
-
-              // 1. Muted String (X)
-              if (fret === -1) {
                 return (
-                  <div
-                    key={`marker-mute-${stringIdx}`}
-                    className="absolute flex items-center justify-center z-40"
+                  <div key={`note-${stringIdx}`}
+                    className="absolute w-10 h-10 z-50 flex items-center justify-center animate-pop-in group"
                     style={{
-                      top: `${headstockHeight - 65}px`,
+                      top: `${centerY}px`,
                       left: `${xPos}px`,
-                      marginLeft: '-16px',
-                      width: '32px'
-                    }}
-                  >
-                    <div className="text-[#cc4444] font-sans font-bold text-xl drop-shadow-[0_1px_1px_rgba(0,0,0,1)] opacity-80">✕</div>
-                  </div>
-                );
-              }
-
-              // 2. Open String (No Capo)
-              if (absoluteFret === 0) {
-                return (
-                  <div
-                    key={`marker-open-${stringIdx}`}
-                    className="absolute flex items-center justify-center z-40"
-                    style={{
-                      top: `${headstockHeight - 50}px`,
-                      left: `${xPos}px`,
-                      marginLeft: '-16px',
-                      width: '32px'
-                    }}
-                  >
+                      transform: 'translate(-50%, -50%)'
+                    }}>
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${isRoot ? 'z-10 scale-110' : ''}`}
+                      className="relative w-full h-full rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 border"
                       style={{
                         backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
                         borderColor: isRoot ? '#e6c190' : '#c29b6d',
                         color: '#2a1b12',
-                        boxShadow: isRoot ? '0 0 15px rgba(230,193,144,0.4)' : '0 0 10px rgba(194,155,109,0.4)'
+                        boxShadow: isRoot
+                          ? '0 0 15px rgba(230,193,144,0.4)'
+                          : '0 0 10px rgba(194,155,109,0.4)',
                       }}
                     >
-                      <span className="font-bold text-xs">{noteName}</span>
+                      <span className="font-bold font-sans text-lg z-10 leading-none">
+                        {noteName}
+                      </span>
                     </div>
                   </div>
                 );
-              }
+              })}
 
-              // 3. Fretted Note (includes "Open" at Capo)
-              const topWireY = getFretY(absoluteFret);
-              const centerY = topWireY - (fretSpacing / 2);
-              // If note is "at capo" (fret === 0 relative to capo), style might be different?
-              // For now, consistent styling. The dot sits ON the capo if fret=0.
-
-              return (
-                <div key={`note-${stringIdx}`}
-                  className="absolute w-10 h-10 z-50 flex items-center justify-center animate-pop-in group"
-                  style={{
-                    top: `${centerY}px`,
-                    left: `${xPos}px`,
-                    transform: 'translate(-50%, -50%)'
-                  }}>
-                  <div
-                    className="relative w-full h-full rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 border"
-                    style={{
-                      backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
-                      borderColor: isRoot ? '#e6c190' : '#c29b6d',
-                      color: '#2a1b12',
-                      boxShadow: isRoot
-                        ? '0 0 15px rgba(230,193,144,0.4)'
-                        : '0 0 10px rgba(194,155,109,0.4)',
-                    }}
-                  >
-                    <span className="font-bold font-sans text-lg z-10 leading-none">
-                      {noteName}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-
+            </div>
           </div>
         </div>
       </div>

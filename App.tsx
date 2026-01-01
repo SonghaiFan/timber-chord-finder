@@ -90,6 +90,9 @@ const App: React.FC = () => {
             isLefty={isLefty}
             showAllNotes={showAllNotes}
             showIntervals={showIntervals}
+            variationIndex={variationIndex}
+            totalVariations={variations.length}
+            onVariationChange={setVariationIndex}
           />
         </div>
 
