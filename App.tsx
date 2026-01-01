@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const [tuning, setTuning] = useState<TuningDefinition>(TUNINGS[0]);
   const [capo, setCapo] = useState<number>(0);
   const [isLefty, setIsLefty] = useState<boolean>(false);
+  const [showAllNotes, setShowAllNotes] = useState<boolean>(false);
 
   const [variationIndex, setVariationIndex] = useState(0);
 
@@ -61,6 +62,7 @@ const App: React.FC = () => {
             tuning={tuning}
             capo={capo}
             isLefty={isLefty}
+            showAllNotes={showAllNotes}
             variations={variations}
             variationIndex={variationIndex}
             onRootChange={setRoot}
@@ -69,6 +71,7 @@ const App: React.FC = () => {
             onTuningChange={setTuning}
             onCapoChange={setCapo}
             onLeftyChange={setIsLefty}
+            onShowAllNotesChange={setShowAllNotes}
             onVariationSelect={setVariationIndex}
           />
         </div>
@@ -82,6 +85,7 @@ const App: React.FC = () => {
             tuning={tuning}
             capo={capo}
             isLefty={isLefty}
+            showAllNotes={showAllNotes}
           />
         </div>
 

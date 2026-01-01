@@ -11,6 +11,7 @@ interface FretboardProps {
   tuning: TuningDefinition;
   capo: number;
   isLefty: boolean;
+  showAllNotes: boolean;
 }
 
 const Fretboard: React.FC<FretboardProps> = ({
@@ -19,10 +20,9 @@ const Fretboard: React.FC<FretboardProps> = ({
   variation,
   tuning,
   capo,
-  isLefty
+  isLefty,
+  showAllNotes
 }) => {
-  const [showAllNotes, setShowAllNotes] = useState(false);
-
   // Calculate target notes (pitch classes)
   const targetNotes = useMemo(() => {
     if (!chordName) return new Set<number>();

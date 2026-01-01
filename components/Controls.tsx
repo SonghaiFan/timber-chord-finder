@@ -10,6 +10,7 @@ interface ControlsProps {
     tuning: TuningDefinition;
     capo: number;
     isLefty: boolean;
+    showAllNotes: boolean;
     variations: number[][];
     variationIndex: number;
     onRootChange: (root: RootNote) => void;
@@ -18,6 +19,7 @@ interface ControlsProps {
     onTuningChange: (tuning: TuningDefinition) => void;
     onCapoChange: (capo: number) => void;
     onLeftyChange: (isLefty: boolean) => void;
+    onShowAllNotesChange: (show: boolean) => void;
     onVariationSelect: (index: number) => void;
 }
 
@@ -28,6 +30,7 @@ const Controls: React.FC<ControlsProps> = ({
     tuning,
     capo,
     isLefty,
+    showAllNotes,
     variations,
     variationIndex,
     onRootChange,
@@ -36,6 +39,7 @@ const Controls: React.FC<ControlsProps> = ({
     onTuningChange,
     onCapoChange,
     onLeftyChange,
+    onShowAllNotesChange,
     onVariationSelect
 }) => {
     const rootContainerRef = useRef<HTMLDivElement>(null);
@@ -173,6 +177,16 @@ const Controls: React.FC<ControlsProps> = ({
                             className="accent-[#e6c190]"
                         />
                         <label htmlFor="lefty" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Lefty Mode</label>
+                    </div>
+                    <div className="flex items-center gap-2 col-span-2">
+                        <input
+                            type="checkbox"
+                            id="showScale"
+                            checked={showAllNotes}
+                            onChange={(e) => onShowAllNotesChange(e.target.checked)}
+                            className="accent-[#e6c190]"
+                        />
+                        <label htmlFor="showScale" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Scale</label>
                     </div>
                 </div>
             )}
