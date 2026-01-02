@@ -114,7 +114,7 @@ function ScrollablePicker<T>({
                 <div
                     ref={containerRef}
                     onScroll={handleScroll}
-                    className="flex overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
+                    className="flex h-full overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
                 >
                     {items.map((item) => {
                         const key = itemKey(item);
@@ -286,6 +286,7 @@ const Controls: React.FC<ControlsProps> = ({
                             selectedItem={selectedRoot}
                             onSelect={onRootChange}
                             itemKey={(item) => item}
+                            className="h-[96px] lg:h-[112px]"
                             renderItem={(root, isSelected) => (
                                 <button
                                     data-active={isSelected}
@@ -310,6 +311,7 @@ const Controls: React.FC<ControlsProps> = ({
                             selectedItem={selectedQuality}
                             onSelect={onQualityChange}
                             itemKey={(item) => item.id}
+                            className="h-[84px] lg:h-[100px]"
                             renderItem={(q, isSelected) => (
                                 <button
                                     data-active={isSelected}
@@ -355,6 +357,7 @@ const Controls: React.FC<ControlsProps> = ({
                                         selectedItem={selectedBass}
                                         onSelect={onBassChange}
                                         itemKey={(item) => item}
+                                        className="h-[72px] lg:h-[88px]"
                                         renderItem={(root, isSelected) => (
                                             <button
                                                 data-active={isSelected}
