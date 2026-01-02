@@ -362,7 +362,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       .map((fret, stringIdx) => {
                         if (fret === -1) return null;
                         const absoluteFret = fret >= 0 ? fret + capo : -1;
-                        
+
                         // Skip open strings for the connection line
                         if (absoluteFret === 0) return null;
 
