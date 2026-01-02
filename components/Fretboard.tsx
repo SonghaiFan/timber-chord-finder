@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { TuningDefinition, ChordVariation } from '../types';
 import { getNoteName, getNoteValue } from '../utils/chordEngine';
 import { CHORD_TYPES } from '../constants';
+import { playNote, playChord } from '../utils/audioEngine';
 
 interface FretboardProps {
   chordName: string;
@@ -221,9 +222,20 @@ const Fretboard: React.FC<FretboardProps> = ({
       {/* Mobile Info Bar */}
       <div className="lg:hidden mb-2">
         <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl border border-[#3a2216] bg-[#1a110b]/80 backdrop-blur-sm shadow-lg">
-          <div className="flex flex-col">
-            <span className="text-lg font-bold leading-tight text-[#e6c190]">{chordName}</span>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#c29b6d]">{formula}</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => variation && playChord(variation.frets, tuning.offsets, capo)}
+              className="w-10 h-10 rounded-full bg-[#e6c190] text-[#2a1b12] flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+              aria-label="Play Chord"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold leading-tight text-[#e6c190]">{chordName}</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#c29b6d]">{formula}</span>
+            </div>
           </div>
           <div className="flex flex-col items-end gap-1">
             {capo > 0 && (
@@ -250,15 +262,26 @@ const Fretboard: React.FC<FretboardProps> = ({
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] pointer-events-none" />
 
         <div className="relative z-10 flex justify-between items-start">
-          <div>
-            <h2 className="text-3xl font-bold leading-none text-[#2a1b12] tracking-tight">{chordName}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="text-xs font-mono text-[#666] font-bold">{formula}</div>
-              {aliases && (
-                <div className="text-[10px] text-[#888] italic border-l border-[#ddd] pl-2">
-                  {aliases}
-                </div>
-              )}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => variation && playChord(variation.frets, tuning.offsets, capo)}
+              className="w-12 h-12 rounded-full bg-[#2a1b12] text-[#e6c190] flex items-center justify-center shadow-md hover:bg-[#3a2216] hover:scale-105 active:scale-95 transition-all group/play"
+              aria-label="Play Chord"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 transition-transform group-hover/play:translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <div>
+              <h2 className="text-3xl font-bold leading-none text-[#2a1b12] tracking-tight">{chordName}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="text-xs font-mono text-[#666] font-bold">{formula}</div>
+                {aliases && (
+                  <div className="text-[10px] text-[#888] italic border-l border-[#ddd] pl-2">
+                    {aliases}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -455,8 +478,10 @@ const Fretboard: React.FC<FretboardProps> = ({
                     }
 
                     return (
-                      <div key={`ghost-${stringIdx}-${physicalFret}`}
-                        className="absolute w-6 h-6 z-30 flex items-center justify-center"
+                      <button
+                        key={`ghost-${stringIdx}-${physicalFret}`}
+                        onClick={() => playNote(stringIdx, physicalFret - capo, tuning.offsets, capo)}
+                        className="absolute w-8 h-8 z-40 flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity cursor-pointer"
                         style={{
                           top: `${topY}px`,
                           left: `${xPos}px`,
@@ -466,7 +491,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                         <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
                           <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
                         </div>
-                      </div>
+                      </button>
                     );
                   }
                   return null;
@@ -537,9 +562,10 @@ const Fretboard: React.FC<FretboardProps> = ({
                 // 1. Muted String (X)
                 if (fret === -1) {
                   return (
-                    <div
+                    <button
                       key={`marker-mute-${stringIdx}`}
-                      className="absolute flex items-center justify-center z-[60]"
+                      onClick={() => playNote(stringIdx, 0, tuning.offsets, capo)} // Play open string even if muted? Or maybe just don't play?
+                      className="absolute flex items-center justify-center z-[60] cursor-pointer hover:scale-110 transition-transform"
                       style={{
                         top: `${markerY - 15}px`,
                         left: `${xPos}px`,
@@ -548,16 +574,17 @@ const Fretboard: React.FC<FretboardProps> = ({
                       }}
                     >
                       <div className="text-[#cc4444] font-sans font-bold text-xl drop-shadow-[0_1px_1px_rgba(0,0,0,1)] opacity-80">✕</div>
-                    </div>
+                    </button>
                   );
                 }
 
                 // 2. Open String (at Nut or Capo)
                 if (fret === 0) {
                   return (
-                    <div
+                    <button
                       key={`marker-open-${stringIdx}`}
-                      className="absolute flex items-center justify-center z-[60]"
+                      onClick={() => playNote(stringIdx, 0, tuning.offsets, capo)}
+                      className="absolute flex items-center justify-center z-[60] cursor-pointer group/open"
                       style={{
                         top: `${markerY}px`,
                         left: `${xPos}px`,
@@ -566,7 +593,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       }}
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${isRoot ? 'z-10 scale-110' : ''}`}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 group-hover/open:scale-110 ${isRoot ? 'z-10 scale-110' : ''}`}
                         style={{
                           backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
                           borderColor: isRoot ? '#e6c190' : '#c29b6d',
@@ -576,7 +603,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       >
                         <span className="font-bold text-xs">{noteName}</span>
                       </div>
-                    </div>
+                    </button>
                   );
                 }
 
@@ -585,15 +612,16 @@ const Fretboard: React.FC<FretboardProps> = ({
                 const centerY = topWireY - (fretSpacing / 2);
 
                 return (
-                  <div key={`note-${stringIdx}`}
-                    className="absolute w-10 h-10 z-50 flex items-center justify-center animate-pop-in group"
+                  <button key={`note-${stringIdx}`}
+                    onClick={() => playNote(stringIdx, fret, tuning.offsets, capo)}
+                    className="absolute w-10 h-10 z-50 flex items-center justify-center animate-pop-in group cursor-pointer"
                     style={{
                       top: `${centerY}px`,
                       left: `${xPos}px`,
                       transform: 'translate(-50%, -50%)'
                     }}>
                     <div
-                      className="relative w-full h-full rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 border"
+                      className="relative w-full h-full rounded-full flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110 border"
                       style={{
                         backgroundColor: isRoot ? '#e6c190' : '#c29b6d',
                         borderColor: isRoot ? '#e6c190' : '#c29b6d',
@@ -607,7 +635,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                         {noteName}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
 
