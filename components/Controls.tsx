@@ -54,7 +54,8 @@ const Controls: React.FC<ControlsProps> = ({
     const qualityScrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const bassScrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const [showSettings, setShowSettings] = useState(false);
+    const [activeTab, setActiveTab] = useState<'finder' | 'settings'>('finder');
+    const [isExpanded, setIsExpanded] = useState(false);
     const [showBass, setShowBass] = useState(false);
 
     // Helper to scroll active item to center
@@ -131,32 +132,50 @@ const Controls: React.FC<ControlsProps> = ({
             {/* Decorative BG */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10 pointer-events-none" />
 
-            {/* Header & Settings Toggle */}
-            <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="w-full flex items-center justify-between z-10 border-b border-[#e6c190]/10 p-4 bg-[#1a110b]/50 hover:bg-[#1a110b]/70 transition-colors text-left outline-none"
-            >
-                <div>
-                    <h1 className="text-xl font-bold text-[#e6c190] uppercase tracking-tighter leading-none font-sans">
-                        AxeGrain
-                    </h1>
-                    <span className="text-[10px] text-[#c29b6d] tracking-widest uppercase">Chord Finder</span>
+            {/* Header & Tabs */}
+            <div className="flex flex-col z-10 border-b border-[#e6c190]/10 bg-[#1a110b]/90 backdrop-blur-sm">
+                <div className="flex items-center justify-between p-4 pb-2">
+                    <div>
+                        <h1 className="text-xl font-bold text-[#e6c190] uppercase tracking-tighter leading-none font-sans">
+                            AxeGrain
+                        </h1>
+                        <span className="text-[10px] text-[#c29b6d] tracking-widest uppercase">Chord Finder</span>
+                    </div>
+                    {/* Mobile Collapse Toggle */}
+                    <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="lg:hidden p-2 text-[#c29b6d]"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
                 </div>
-                <div
-                    className={`p-2 rounded transition-colors ${showSettings ? 'text-[#e6c190] bg-[#3a2216]' : 'text-[#c29b6d]'}`}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+
+                {/* Tabs */}
+                <div className="flex px-4 gap-6">
+                    <button
+                        onClick={() => { setActiveTab('finder'); setIsExpanded(true); }}
+                        className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'finder' ? 'text-[#e6c190] border-[#e6c190]' : 'text-[#666] border-transparent hover:text-[#c29b6d]'}`}
+                    >
+                        Finder
+                    </button>
+                    <button
+                        onClick={() => { setActiveTab('settings'); setIsExpanded(true); }}
+                        className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${activeTab === 'settings' ? 'text-[#e6c190] border-[#e6c190]' : 'text-[#666] border-transparent hover:text-[#c29b6d]'}`}
+                    >
+                        Settings
+                    </button>
                 </div>
-            </button>
+            </div>
 
-            {/* Main Controls */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 space-y-2 lg:space-y-6 ${showSettings ? 'animate-slide-down' : 'hidden lg:block'}`}>
+            {/* Main Content */}
+            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
 
-                {/* Settings Panel */}
-                {showSettings && (
-                    <div className="bg-[#120c08] p-4 rounded-lg border border-[#e6c190]/10 grid grid-cols-2 gap-4 text-xs mb-4">
+                {activeTab === 'settings' ? (
+                    /* Settings Panel */
+                    <div className="space-y-4 animate-fade-in">
+                        <div className="bg-[#120c08] p-4 rounded-lg border border-[#e6c190]/10 grid grid-cols-1 gap-4 text-xs">
                         <div className="flex flex-col gap-1">
                             <label className="text-[#888] font-bold uppercase tracking-wider">Tuning</label>
                             <select
@@ -177,7 +196,7 @@ const Controls: React.FC<ControlsProps> = ({
                                 {CAPO_POSITIONS.map(p => <option key={p} value={p}>{p === 0 ? '- None -' : `Fret ${p}`}</option>)}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2 col-span-2 pt-2">
+                        <div className="flex items-center gap-2 pt-2">
                             <input
                                 type="checkbox"
                                 id="lefty"
@@ -187,7 +206,7 @@ const Controls: React.FC<ControlsProps> = ({
                             />
                             <label htmlFor="lefty" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Lefty Mode</label>
                         </div>
-                        <div className="flex items-center gap-2 col-span-2">
+                        <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
                                 id="showScale"
@@ -197,7 +216,7 @@ const Controls: React.FC<ControlsProps> = ({
                             />
                             <label htmlFor="showScale" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Scale</label>
                         </div>
-                        <div className="flex items-center gap-2 col-span-2">
+                        <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
                                 id="showIntervals"
@@ -208,10 +227,12 @@ const Controls: React.FC<ControlsProps> = ({
                             <label htmlFor="showIntervals" className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer">Show Intervals</label>
                         </div>
                     </div>
-                )}
-
-                {/* Root Picker */}
-                <div className="space-y-1 lg:space-y-2">
+                </div>
+                ) : (
+                    /* Finder Controls */
+                    <div className="space-y-2 lg:space-y-6 animate-fade-in h-full flex flex-col">
+                        {/* Root Picker */}
+                        <div className="space-y-1 lg:space-y-2">
                     <div className="flex justify-between items-center px-1">
                         <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Root</span>
                         <span className="text-xs font-bold text-[#e6c190] bg-[#1a110b] px-3 py-1 rounded-md border border-[#3a2216]">{selectedRoot}</span>
@@ -376,6 +397,8 @@ const Controls: React.FC<ControlsProps> = ({
                         )}
                     </div>
                 </div>
+                    </div>
+                )}
 
             </div>
         </div>
