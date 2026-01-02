@@ -45,3 +45,9 @@ export interface TuningDefinition {
   // Easier: Array of 6 integers representing the pitch of open strings relative to C=0 (e.g. E=4).
   // Standard: [4, 9, 2, 7, 11, 4]
 }
+
+export interface ScaleDefinition {
+  id: string;
+  name: string;
+  intervals: number[];
+}

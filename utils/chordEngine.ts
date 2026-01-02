@@ -448,7 +448,10 @@ export function generateChords(
     const spanA = getSpan(a);
     const spanB = getSpan(b);
 
-    // 1. Root-Shape Match (The "Golden" Rule)
+    // 1. Position (Lower fret to Higher fret) - User Priority
+    if (aMin !== bMin) return aMin - bMin;
+
+    // 2. Root-Shape Match (The "Golden" Rule)
     // If Root is C, and Shape is C, this is the best.
     const shapeA = identifyCAGEDShape(a, rootVal, nutTuning);
     const shapeB = identifyCAGEDShape(b, rootVal, nutTuning);
@@ -462,11 +465,8 @@ export function generateChords(
     if (isRootMatchA && !isRootMatchB) return -1;
     if (!isRootMatchA && isRootMatchB) return 1;
 
-    // 2. Finger Count (Less nodes)
+    // 3. Finger Count (Less nodes)
     if (fingersA !== fingersB) return fingersA - fingersB;
-
-    // 3. Position (Lower fret)
-    if (aMin !== bMin) return aMin - bMin;
 
     // 4. Span (Less fret cross)
     if (spanA !== spanB) return spanA - spanB;

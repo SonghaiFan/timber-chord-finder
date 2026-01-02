@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { ROOTS, CHORD_TYPES, TUNINGS, CAPO_POSITIONS } from '../constants';
-import { RootNote, ChordType, TuningDefinition, ChordVariation } from '../types';
+import { ROOTS, CHORD_TYPES, TUNINGS, CAPO_POSITIONS, SCALES } from '../constants';
+import { RootNote, ChordType, TuningDefinition, ChordVariation, ScaleDefinition } from '../types';
 import { getNoteValue, getNoteName } from '../utils/chordEngine';
 
 // --- Types ---
@@ -15,6 +15,7 @@ interface ControlsProps {
     isLefty: boolean;
     preferFlats: boolean | null;
     showAllNotes: boolean;
+    selectedScale: ScaleDefinition | null;
     showIntervals: boolean;
     variations: ChordVariation[];
     variationIndex: number;
@@ -26,6 +27,7 @@ interface ControlsProps {
     onLeftyChange: (isLefty: boolean) => void;
     onPreferFlatsChange: (val: boolean | null) => void;
     onShowAllNotesChange: (show: boolean) => void;
+    onScaleChange: (scale: ScaleDefinition | null) => void;
     onShowIntervalsChange: (show: boolean) => void;
     onVariationSelect: (index: number) => void;
 }
@@ -201,6 +203,7 @@ const Controls: React.FC<ControlsProps> = ({
     isLefty,
     preferFlats,
     showAllNotes,
+    selectedScale,
     showIntervals,
     variations,
     variationIndex,
@@ -212,6 +215,7 @@ const Controls: React.FC<ControlsProps> = ({
     onLeftyChange,
     onPreferFlatsChange,
     onShowAllNotesChange,
+    onScaleChange,
     onShowIntervalsChange,
     onVariationSelect
 }) => {
@@ -300,9 +304,15 @@ const Controls: React.FC<ControlsProps> = ({
                                     else onPreferFlatsChange(false);
                                 }}
                             />
+                            <Select
+                                label="Scale Overlay"
+                                value={selectedScale?.id || 'none'}
+                                options={SCALES.map(s => ({ value: s.id, label: s.name }))}
+                                onChange={(val) => onScaleChange(SCALES.find(s => s.id === val) || null)}
+                            />
                             <div className="pt-2 space-y-2">
                                 <Toggle id="lefty" label="Lefty Mode" checked={isLefty} onChange={onLeftyChange} />
-                                <Toggle id="showScale" label="Show Scale" checked={showAllNotes} onChange={onShowAllNotesChange} />
+                                <Toggle id="showScale" label="Show All Chord Tones" checked={showAllNotes} onChange={onShowAllNotesChange} />
                                 <Toggle id="showIntervals" label="Show Intervals" checked={showIntervals} onChange={onShowIntervalsChange} />
                             </div>
                         </div>

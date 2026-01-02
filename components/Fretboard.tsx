@@ -1,8 +1,8 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { TuningDefinition, ChordVariation } from '../types';
+import { TuningDefinition, ChordVariation, ScaleDefinition, RootNote } from '../types';
 import { getNoteName, getNoteValue } from '../utils/chordEngine';
-import { CHORD_TYPES } from '../constants';
+import { CHORD_TYPES, SCALES } from '../constants';
 import { playNote, playChord } from '../utils/audioEngine';
 
 interface FretboardProps {
@@ -14,6 +14,7 @@ interface FretboardProps {
   capo: number;
   isLefty: boolean;
   showAllNotes: boolean;
+  selectedScale: ScaleDefinition | null;
   showIntervals: boolean;
   variationIndex: number;
   totalVariations: number;
@@ -31,6 +32,7 @@ const Fretboard: React.FC<FretboardProps> = ({
   capo,
   isLefty,
   showAllNotes,
+  selectedScale,
   showIntervals,
   variationIndex,
   totalVariations,
@@ -59,6 +61,18 @@ const Fretboard: React.FC<FretboardProps> = ({
 
     return { targetNotes: notes, rootVal: rVal };
   }, [chordName, formula]);
+
+  // Calculate scale notes
+  const scaleNotes = useMemo(() => {
+    if (!selectedScale || !chordName) return new Set<number>();
+    const rootStr = chordName.split(' ')[0];
+    const rVal = getNoteValue(rootStr);
+    const notes = new Set<number>();
+    selectedScale.intervals.forEach(interval => {
+      notes.add((rVal + interval) % 12);
+    });
+    return notes;
+  }, [selectedScale, chordName]);
 
   const useFlats = chordName.includes('b') || chordName.includes('\u266d');
 
@@ -490,6 +504,54 @@ const Fretboard: React.FC<FretboardProps> = ({
                       >
                         <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
                           <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
+                        </div>
+                      </button>
+                    );
+                  }
+                  return null;
+                });
+              })}
+
+              {/* Scale Overlay (Ghost Notes) */}
+              {selectedScale && tuning.offsets.map((_, stringIdx) => {
+                return Array.from({ length: totalFrets + 1 }).map((_, i) => {
+                  const physicalFret = i;
+                  if (physicalFret < capo) return null;
+
+                  const pitch = tuning.offsets[stringIdx] + physicalFret;
+                  const noteVal = pitch % 12;
+
+                  if (scaleNotes.has(noteVal)) {
+                    // Don't show if it's a main chord note
+                    const isMainNote = variation && (variation.frets[stringIdx] !== -1) && (variation.frets[stringIdx] + capo === physicalFret);
+                    if (isMainNote) return null;
+
+                    // Don't show if "Show All Notes" is on and it's already showing a chord tone
+                    if (showAllNotes && targetNotes.has(noteVal)) return null;
+
+                    const xPos = getStringX(stringIdx);
+                    let topY;
+                    if (physicalFret === 0) {
+                      topY = headstockHeight - 30;
+                    } else {
+                      topY = getFretY(physicalFret) - (fretSpacing / 2);
+                    }
+
+                    const isRoot = noteVal === rootVal;
+
+                    return (
+                      <button
+                        key={`scale-${stringIdx}-${physicalFret}`}
+                        onClick={() => playNote(stringIdx, physicalFret - capo, tuning.offsets, capo)}
+                        className="absolute w-8 h-8 z-40 flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                        style={{
+                          top: `${topY}px`,
+                          left: `${xPos}px`,
+                          transform: 'translate(-50%, -50%)'
+                        }}
+                      >
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm ${isRoot ? 'bg-[#e6c190]/40' : 'bg-[#c29b6d]/20'}`}>
+                          <span className={`text-[9px] font-bold ${isRoot ? 'text-[#e6c190]' : 'text-[#c29b6d]'}`}>{getNoteLabel(pitch)}</span>
                         </div>
                       </button>
                     );

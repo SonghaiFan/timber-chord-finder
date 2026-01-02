@@ -3,8 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import WoodGrain from './components/WoodGrain';
 import Controls from './components/Controls';
 import Fretboard from './components/Fretboard';
-import { CHORD_TYPES, TUNINGS } from './constants';
-import { RootNote, ChordType, TuningDefinition } from './types';
+import { CHORD_TYPES, TUNINGS, SCALES } from './constants';
+import { RootNote, ChordType, TuningDefinition, ScaleDefinition } from './types';
 import { getNoteName, getNoteValue, generateChords } from './utils/chordEngine';
 
 const App: React.FC = () => {
@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [isLefty, setIsLefty] = useState<boolean>(false);
   const [preferFlats, setPreferFlats] = useState<boolean | null>(null); // null = auto
   const [showAllNotes, setShowAllNotes] = useState<boolean>(false);
+  const [selectedScale, setSelectedScale] = useState<ScaleDefinition | null>(null);
   const [showIntervals, setShowIntervals] = useState<boolean>(false);
 
   const [variationIndex, setVariationIndex] = useState(0);
@@ -83,7 +84,10 @@ const App: React.FC = () => {
             onCapoChange={setCapo}
             onLeftyChange={setIsLefty}
             onPreferFlatsChange={setPreferFlats}
+            showAllNotes={showAllNotes}
             onShowAllNotesChange={setShowAllNotes}
+            selectedScale={selectedScale}
+            onScaleChange={setSelectedScale}
             showIntervals={showIntervals}
             onShowIntervalsChange={setShowIntervals}
             onVariationSelect={setVariationIndex}
@@ -101,6 +105,7 @@ const App: React.FC = () => {
             capo={capo}
             isLefty={isLefty}
             showAllNotes={showAllNotes}
+            selectedScale={selectedScale}
             showIntervals={showIntervals}
             variationIndex={variationIndex}
             totalVariations={variations.length}
