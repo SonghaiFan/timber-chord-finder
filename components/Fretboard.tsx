@@ -495,14 +495,14 @@ const Fretboard: React.FC<FretboardProps> = ({
                       <button
                         key={`ghost-${stringIdx}-${physicalFret}`}
                         onClick={() => playNote(stringIdx, physicalFret - capo, tuning.offsets, capo)}
-                        className="absolute w-8 h-8 z-40 flex items-center justify-center opacity-40 hover:opacity-100 transition-opacity cursor-pointer"
+                        className="absolute w-8 h-8 z-40 flex items-center justify-center transition-opacity cursor-pointer"
                         style={{
                           top: `${topY}px`,
                           left: `${xPos}px`,
                           transform: 'translate(-50%, -50%)'
                         }}
                       >
-                        <div className="w-6 h-6 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
+                        <div className="w-6 h-6 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm">
                           <span className="text-[10px] font-black text-[#777] leading-none flex items-center justify-center" style={{ transform: 'translateY(0.5px)' }}>
                             {getNoteLabel(pitch)}
                           </span>
@@ -545,7 +545,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       <button
                         key={`scale-${stringIdx}-${physicalFret}`}
                         onClick={() => playNote(stringIdx, physicalFret - capo, tuning.offsets, capo)}
-                        className="absolute w-8 h-8 z-40 flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                        className="absolute w-8 h-8 z-40 flex items-center justify-center  transition-opacity cursor-pointer"
                         style={{
                           top: `${topY}px`,
                           left: `${xPos}px`,
