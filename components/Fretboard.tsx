@@ -33,6 +33,9 @@ const Fretboard: React.FC<FretboardProps> = ({
   totalVariations,
   onVariationChange
 }) => {
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(totalVariations > 1);
+
   // Calculate target notes (pitch classes)
   const { targetNotes, rootVal } = useMemo(() => {
     if (!chordName) return { targetNotes: new Set<number>(), rootVal: 0 };
@@ -84,6 +87,56 @@ const Fretboard: React.FC<FretboardProps> = ({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (totalVariations <= 1) {
+      setShowSwipeHint(false);
+      return;
+    }
+    setShowSwipeHint(true);
+    const timer = setTimeout(() => setShowSwipeHint(false), 4000);
+    return () => clearTimeout(timer);
+  }, [totalVariations]);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (totalVariations <= 1) return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!touchStartRef.current || totalVariations <= 1) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+
+    // If user is clearly swiping horizontally, prevent vertical scroll jitter.
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 25) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start || totalVariations <= 1) return;
+
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    const dt = Date.now() - start.time;
+
+    const horizontalSwipe = Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) && dt < 800;
+
+    if (horizontalSwipe) {
+      if (dx < 0) {
+        onVariationChange((variationIndex + 1) % totalVariations);
+      } else {
+        onVariationChange((variationIndex - 1 + totalVariations) % totalVariations);
+      }
+      setShowSwipeHint(false);
+    }
+  };
+
   // Auto-scroll logic
   useEffect(() => {
     if (variation && scrollContainerRef.current) {
@@ -117,7 +170,34 @@ const Fretboard: React.FC<FretboardProps> = ({
   }, [variation, chordName, isLefty, capo]);
 
   return (
-    <div className="flex flex-col h-full w-full max-w-md mx-auto lg:max-w-none">
+    <div className="relative flex flex-col h-full w-full max-w-md mx-auto lg:max-w-none">
+
+      {/* Mobile Info Bar */}
+      <div className="lg:hidden mb-2">
+        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl border border-[#3a2216] bg-[#1a110b]/80 backdrop-blur-sm shadow-lg">
+          <div className="flex flex-col">
+            <span className="text-lg font-bold leading-tight text-[#e6c190]">{chordName}</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#c29b6d]">{formula}</span>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            {capo > 0 && (
+              <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-[#2a1b12] text-[#e6c190] border border-[#e6c190]/40 uppercase tracking-wider shadow-sm">
+                Capo {capo}
+              </span>
+            )}
+            <span className="text-[11px] text-[#c29b6d] font-bold">
+              Var {Math.min(variationIndex + 1, totalVariations)}/{Math.max(totalVariations, 1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {totalVariations > 1 && showSwipeHint && (
+        <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded-full bg-[#1a110b]/80 border border-[#3a2216] shadow-lg backdrop-blur-sm text-[11px] font-bold uppercase tracking-widest text-[#e6c190] flex items-center gap-2 pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#e6c190] animate-pulse"></span>
+          Swipe for shapes
+        </div>
+      )}
 
       {/* Info Panel */}
       <div className="hidden lg:flex mb-2 p-3 bg-[#fdfbf7] border-2 border-[#1a110b] rounded-lg shadow-lg flex-col gap-2 text-[#1a110b] relative overflow-hidden flex-shrink-0 z-20">
@@ -178,6 +258,10 @@ const Fretboard: React.FC<FretboardProps> = ({
 
         <div
           ref={scrollContainerRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{ touchAction: 'pan-y' }}
           className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl  shadow-2xl relative"
         >
           <div className="flex justify-center pb-24 min-h-full">

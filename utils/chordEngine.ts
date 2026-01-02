@@ -177,57 +177,40 @@ function identifyCAGEDShape(
 
   if (!isStandard) return undefined;
 
-  let bestShape: string | undefined = undefined;
-  let maxScore = -Infinity;
+  for (const pattern of CAGED_PATTERNS) {
+    const anchorFret = shape[pattern.anchorString];
 
-  // Find all strings that hold the root note
-  const rootIndices: number[] = [];
-  shape.forEach((fret, stringIdx) => {
-    if (fret !== -1) {
-      const note = (tuning[stringIdx] + fret) % 12;
-      if (note === rootVal) {
-        rootIndices.push(stringIdx);
-      }
-    }
-  });
+    // Anchor string must be played
+    if (anchorFret === -1) continue;
 
-  for (const rootStringIdx of rootIndices) {
-    const rootFret = shape[rootStringIdx];
+    // Anchor note must be the root
+    const noteAtAnchor = (tuning[pattern.anchorString] + anchorFret) % 12;
+    if (noteAtAnchor !== rootVal) continue;
 
-    const applicablePatterns = CAGED_PATTERNS.filter(
-      (p) => p.anchorString === rootStringIdx
-    );
+    let isMatch = true;
+    for (let s = 0; s < 6; s++) {
+      const shapeFret = shape[s];
+      const offset = pattern.offsets[s];
 
-    for (const pattern of applicablePatterns) {
-      let score = 0;
-      let matches = 0;
-
-      for (let s = 0; s < 6; s++) {
-        const shapeFret = shape[s];
-        const offset = pattern.offsets[s];
-
-        if (offset === null) continue;
-
-        const expectedFret = rootFret + offset;
-
-        if (shapeFret === expectedFret) {
-          score += 2;
-          matches++;
-        } else if (shapeFret !== -1) {
-          score -= 1;
+      if (offset === null) {
+        // Strict: Must be muted
+        if (shapeFret !== -1) {
+          isMatch = false;
+          break;
         }
-      }
-
-      if (matches >= 3) {
-        if (score > maxScore) {
-          maxScore = score;
-          bestShape = pattern.name;
+      } else {
+        // Strict: Must match offset exactly
+        if (shapeFret !== anchorFret + offset) {
+          isMatch = false;
+          break;
         }
       }
     }
+
+    if (isMatch) return pattern.name;
   }
 
-  return bestShape;
+  return undefined;
 }
 
 /**
