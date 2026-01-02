@@ -1,4 +1,4 @@
-# Timber Chord Finder
+# Guitar Chord Finder
 
 A beautiful, wood-themed guitar chord finder application built with React, TypeScript, and Vite.
 
