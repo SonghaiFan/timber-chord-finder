@@ -7,6 +7,7 @@ import { CHORD_TYPES } from '../constants';
 interface FretboardProps {
   chordName: string;
   formula: string;
+  aliases?: string;
   variation: ChordVariation | null;
   tuning: TuningDefinition;
   capo: number;
@@ -23,6 +24,7 @@ const INTERVAL_NAMES = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b
 const Fretboard: React.FC<FretboardProps> = ({
   chordName,
   formula,
+  aliases,
   variation,
   tuning,
   capo,
@@ -57,31 +59,36 @@ const Fretboard: React.FC<FretboardProps> = ({
     return { targetNotes: notes, rootVal: rVal };
   }, [chordName, formula]);
 
+  const useFlats = chordName.includes('b') || chordName.includes('\u266d');
+
   const getNoteLabel = (pitch: number) => {
     if (showIntervals) {
       const interval = (pitch - rootVal + 12) % 12;
       return INTERVAL_NAMES[interval];
     }
-    return getNoteName(pitch);
+    return getNoteName(pitch, useFlats);
   };
 
   // Config for Vertical Fretboard
   const headstockHeight = 80;
   const fretSpacing = 50;
   const minFrets = 22;
-  
+
   // Calculate total frets to fill the view height
   const fretsToFill = viewHeight > 0 ? Math.ceil((viewHeight - headstockHeight) / fretSpacing) : 0;
   const totalFrets = Math.max(minFrets, fretsToFill);
 
-  const stringNames = tuning.offsets.map(offset => getNoteName(offset));
+  const stringNames = tuning.offsets.map(offset => getNoteName(offset, useFlats));
 
   // Dimensions
-  const boardWidth = 280;
+  const numStrings = tuning.offsets.length;
+  const stringSpacing = 44;
+  const boardPadding = 30;
+  const boardWidth = (numStrings - 1) * stringSpacing + (boardPadding * 2);
   const boardHeight = totalFrets * fretSpacing;
 
   const getStringX = (index: number) => {
-    const x = 30 + (index * 44);
+    const x = boardPadding + (index * stringSpacing);
     if (isLefty) {
       return boardWidth - x; // Mirror
     }
@@ -245,7 +252,14 @@ const Fretboard: React.FC<FretboardProps> = ({
         <div className="relative z-10 flex justify-between items-start">
           <div>
             <h2 className="text-3xl font-bold leading-none text-[#2a1b12] tracking-tight">{chordName}</h2>
-            <div className="text-xs font-mono text-[#666] mt-1 font-bold">{formula}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="text-xs font-mono text-[#666] font-bold">{formula}</div>
+              {aliases && (
+                <div className="text-[10px] text-[#888] italic border-l border-[#ddd] pl-2">
+                  {aliases}
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-2">
             {capo > 0 && (
@@ -262,7 +276,7 @@ const Fretboard: React.FC<FretboardProps> = ({
             {variation?.frets.map((f, i) => {
               if (f < 0) return null;
               const pitch = tuning.offsets[i] + capo + f;
-              return getNoteName(pitch);
+              return getNoteName(pitch, useFlats);
             }).filter(Boolean).join(', ')}
           </span>
         </div>
@@ -335,11 +349,12 @@ const Fretboard: React.FC<FretboardProps> = ({
               {Array.from({ length: totalFrets }).map((_, i) => {
                 const fretNum = i + 1;
                 const topY = getFretY(fretNum);
+                const isBeforeCapo = fretNum <= capo;
 
                 return (
                   <React.Fragment key={`fret-${fretNum}`}>
                     <div
-                      className="absolute left-0 right-0 h-[4px] z-10 shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+                      className={`absolute left-0 right-0 h-[4px] z-10 shadow-[0_2px_4px_rgba(0,0,0,0.5)] transition-opacity duration-300 ${isBeforeCapo ? 'opacity-20' : 'opacity-100'}`}
                       style={{
                         top: `${topY}px`,
                         background: 'linear-gradient(180deg, #888 0%, #fff 40%, #ccc 60%, #444 100%)',
@@ -349,7 +364,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 
                     {/* Fret Number */}
                     <span
-                      className={`absolute text-xs text-[#c29b6d] font-mono font-bold opacity-50 w-8 text-right flex items-center justify-end`}
+                      className={`absolute text-xs text-[#c29b6d] font-mono font-bold w-8 text-right flex items-center justify-end transition-opacity duration-300 ${isBeforeCapo ? 'opacity-10' : 'opacity-50'}`}
                       style={{
                         top: `${topY - (fretSpacing / 2) - 8}px`,
                         height: '16px',
@@ -362,7 +377,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                     {/* Inlay Dots */}
                     {[3, 5, 7, 9, 15, 17, 19].includes(fretNum) && (
                       <div
-                        className="absolute left-1/2 w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
+                        className={`absolute left-1/2 w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px] transition-opacity duration-300 ${isBeforeCapo ? 'opacity-10' : 'opacity-100'}`}
                         style={{
                           top: `${topY - (fretSpacing / 2) + 25}px`,
                           background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
@@ -372,13 +387,13 @@ const Fretboard: React.FC<FretboardProps> = ({
                     )}
                     {fretNum === 12 && (
                       <>
-                        <div className="absolute left-[30%] w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px]"
+                        <div className={`absolute left-[30%] w-5 h-5 rounded-full z-0 -ml-2.5 -mt-[25px] transition-opacity duration-300 ${isBeforeCapo ? 'opacity-10' : 'opacity-100'}`}
                           style={{
                             top: `${topY - (fretSpacing / 2) + 25}px`,
                             background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
                             boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.3)'
                           }} />
-                        <div className="absolute right-[30%] w-5 h-5 rounded-full z-0 -mr-2.5 -mt-[25px]"
+                        <div className={`absolute right-[30%] w-5 h-5 rounded-full z-0 -mr-2.5 -mt-[25px] transition-opacity duration-300 ${isBeforeCapo ? 'opacity-10' : 'opacity-100'}`}
                           style={{
                             top: `${topY - (fretSpacing / 2) + 25}px`,
                             background: 'radial-gradient(circle at 30% 30%, #fff 0%, #e6e2d8 40%, #999 100%)',
@@ -410,7 +425,7 @@ const Fretboard: React.FC<FretboardProps> = ({
               )}
 
               {/* All Chord Tones (Ghost Notes) */}
-              {showAllNotes && Array.from({ length: 6 }).map((_, stringIdx) => {
+              {showAllNotes && tuning.offsets.map((_, stringIdx) => {
                 return Array.from({ length: totalFrets + 1 }).map((_, i) => {
                   const physicalFret = i; // 0..22
 
@@ -507,13 +522,17 @@ const Fretboard: React.FC<FretboardProps> = ({
                 // Pitch calculation
                 const pitch = tuning.offsets[stringIdx] + capo + (fret === -1 ? 0 : fret);
                 const noteName = getNoteLabel(pitch);
-                const rootName = chordName.split(' ')[0];
-                const isRoot = (pitch % 12) === rootVal; // Better root check using value
+                const isRoot = (pitch % 12) === rootVal;
 
                 // Logic for handling position with Capo
                 // Engine returns fret relative to Capo (0 = open at capo).
                 // Absolute fret = fret + capo.
                 const absoluteFret = fret >= 0 ? fret + capo : -1;
+
+                // Calculate Y position for "above the nut/capo" markers
+                const markerY = capo > 0
+                  ? getFretY(capo) - 50 // Just above the capo
+                  : headstockHeight - 50; // Just above the nut
 
                 // 1. Muted String (X)
                 if (fret === -1) {
@@ -522,7 +541,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                       key={`marker-mute-${stringIdx}`}
                       className="absolute flex items-center justify-center z-[60]"
                       style={{
-                        top: `${headstockHeight - 65}px`,
+                        top: `${markerY - 15}px`,
                         left: `${xPos}px`,
                         marginLeft: '-16px',
                         width: '32px'
@@ -533,14 +552,14 @@ const Fretboard: React.FC<FretboardProps> = ({
                   );
                 }
 
-                // 2. Open String (No Capo)
-                if (absoluteFret === 0) {
+                // 2. Open String (at Nut or Capo)
+                if (fret === 0) {
                   return (
                     <div
                       key={`marker-open-${stringIdx}`}
                       className="absolute flex items-center justify-center z-[60]"
                       style={{
-                        top: `${headstockHeight - 50}px`,
+                        top: `${markerY}px`,
                         left: `${xPos}px`,
                         marginLeft: '-16px',
                         width: '32px'
@@ -561,11 +580,9 @@ const Fretboard: React.FC<FretboardProps> = ({
                   );
                 }
 
-                // 3. Fretted Note (includes "Open" at Capo)
+                // 3. Fretted Note
                 const topWireY = getFretY(absoluteFret);
                 const centerY = topWireY - (fretSpacing / 2);
-                // If note is "at capo" (fret === 0 relative to capo), style might be different?
-                // For now, consistent styling. The dot sits ON the capo if fret=0.
 
                 return (
                   <div key={`note-${stringIdx}`}

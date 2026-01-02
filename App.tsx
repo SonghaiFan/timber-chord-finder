@@ -5,7 +5,7 @@ import Controls from './components/Controls';
 import Fretboard from './components/Fretboard';
 import { CHORD_TYPES, TUNINGS } from './constants';
 import { RootNote, ChordType, TuningDefinition } from './types';
-import { getNoteValue, generateChords } from './utils/chordEngine';
+import { getNoteName, getNoteValue, generateChords } from './utils/chordEngine';
 
 const App: React.FC = () => {
   const [root, setRoot] = useState<RootNote>('C');
@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const [tuning, setTuning] = useState<TuningDefinition>(TUNINGS[0]);
   const [capo, setCapo] = useState<number>(0);
   const [isLefty, setIsLefty] = useState<boolean>(false);
+  const [preferFlats, setPreferFlats] = useState<boolean | null>(null); // null = auto
   const [showAllNotes, setShowAllNotes] = useState<boolean>(false);
   const [showIntervals, setShowIntervals] = useState<boolean>(false);
 
@@ -38,7 +39,15 @@ const App: React.FC = () => {
   }, [root, quality, bass, tuning, capo]);
 
   const currentVariation = variations[variationIndex] || null;
-  const displayName = `${root} ${quality.name}${bass !== root ? ` / ${bass}` : ''}`;
+  
+  // Determine whether to use flats or sharps
+  const useFlats = preferFlats !== null 
+    ? preferFlats 
+    : (root.includes('b') || root.includes('\u266d'));
+
+  const rootName = getNoteName(getNoteValue(root), useFlats);
+  const bassName = getNoteName(getNoteValue(bass), useFlats);
+  const displayName = `${rootName} ${quality.name}${bass !== root ? ` / ${bassName}` : ''}`;
 
   return (
     <div className="fixed inset-0 w-full h-full bg-[#120c08] flex items-center justify-center p-2 lg:p-8 font-sans text-[#e6c190] overflow-hidden">
@@ -63,6 +72,7 @@ const App: React.FC = () => {
             tuning={tuning}
             capo={capo}
             isLefty={isLefty}
+            preferFlats={preferFlats}
             showAllNotes={showAllNotes}
             variations={variations}
             variationIndex={variationIndex}
@@ -72,6 +82,7 @@ const App: React.FC = () => {
             onTuningChange={setTuning}
             onCapoChange={setCapo}
             onLeftyChange={setIsLefty}
+            onPreferFlatsChange={setPreferFlats}
             onShowAllNotesChange={setShowAllNotes}
             showIntervals={showIntervals}
             onShowIntervalsChange={setShowIntervals}
@@ -84,6 +95,7 @@ const App: React.FC = () => {
           <Fretboard
             chordName={displayName}
             formula={quality.formula}
+            aliases={quality.aliases}
             variation={currentVariation}
             tuning={tuning}
             capo={capo}

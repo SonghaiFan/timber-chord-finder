@@ -1,7 +1,8 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { ROOTS, CHORD_TYPES, TUNINGS, CAPO_POSITIONS } from '../constants';
 import { RootNote, ChordType, TuningDefinition, ChordVariation } from '../types';
+import { getNoteValue, getNoteName } from '../utils/chordEngine';
 
 // --- Types ---
 
@@ -12,6 +13,7 @@ interface ControlsProps {
     tuning: TuningDefinition;
     capo: number;
     isLefty: boolean;
+    preferFlats: boolean | null;
     showAllNotes: boolean;
     showIntervals: boolean;
     variations: ChordVariation[];
@@ -22,6 +24,7 @@ interface ControlsProps {
     onTuningChange: (tuning: TuningDefinition) => void;
     onCapoChange: (capo: number) => void;
     onLeftyChange: (isLefty: boolean) => void;
+    onPreferFlatsChange: (val: boolean | null) => void;
     onShowAllNotesChange: (show: boolean) => void;
     onShowIntervalsChange: (show: boolean) => void;
     onVariationSelect: (index: number) => void;
@@ -139,8 +142,8 @@ const TabButton: React.FC<{
     <button
         onClick={onClick}
         className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${active
-                ? 'text-[#e6c190] border-[#e6c190]'
-                : 'text-[#666] border-transparent hover:text-[#c29b6d]'
+            ? 'text-[#e6c190] border-[#e6c190]'
+            : 'text-[#666] border-transparent hover:text-[#c29b6d]'
             }`}
     >
         {children}
@@ -196,6 +199,7 @@ const Controls: React.FC<ControlsProps> = ({
     tuning,
     capo,
     isLefty,
+    preferFlats,
     showAllNotes,
     showIntervals,
     variations,
@@ -206,6 +210,7 @@ const Controls: React.FC<ControlsProps> = ({
     onTuningChange,
     onCapoChange,
     onLeftyChange,
+    onPreferFlatsChange,
     onShowAllNotesChange,
     onShowIntervalsChange,
     onVariationSelect
@@ -213,6 +218,18 @@ const Controls: React.FC<ControlsProps> = ({
     const [activeTab, setActiveTab] = useState<'finder' | 'settings'>('finder');
     const [isExpanded, setIsExpanded] = useState(true);
     const [showBass, setShowBass] = useState(false);
+
+    const useFlats = preferFlats !== null 
+        ? preferFlats 
+        : (selectedRoot.includes('b') || selectedRoot.includes('\u266d'));
+
+    const chordTones = useMemo(() => {
+        const rootVal = getNoteValue(selectedRoot);
+        return selectedQuality.intervals.map(interval => {
+            const noteVal = (rootVal + interval) % 12;
+            return getNoteName(noteVal, useFlats) as RootNote;
+        });
+    }, [selectedRoot, selectedQuality, useFlats]);
 
     const formatVariation = (v: ChordVariation) => {
         return v.frets.map(n => n === -1 ? 'x' : n).join(' ');
@@ -269,6 +286,20 @@ const Controls: React.FC<ControlsProps> = ({
                                 options={CAPO_POSITIONS.map(p => ({ value: p, label: p === 0 ? '- None -' : `Fret ${p}` }))}
                                 onChange={(val) => onCapoChange(Number(val))}
                             />
+                            <Select
+                                label="Accidentals"
+                                value={preferFlats === null ? 'auto' : preferFlats ? 'flats' : 'sharps'}
+                                options={[
+                                    { value: 'auto', label: 'Auto (Smart)' },
+                                    { value: 'flats', label: 'Force Flats (\u266d)' },
+                                    { value: 'sharps', label: 'Force Sharps (\u266f)' }
+                                ]}
+                                onChange={(val) => {
+                                    if (val === 'auto') onPreferFlatsChange(null);
+                                    else if (val === 'flats') onPreferFlatsChange(true);
+                                    else onPreferFlatsChange(false);
+                                }}
+                            />
                             <div className="pt-2 space-y-2">
                                 <Toggle id="lefty" label="Lefty Mode" checked={isLefty} onChange={onLeftyChange} />
                                 <Toggle id="showScale" label="Show Scale" checked={showAllNotes} onChange={onShowAllNotesChange} />
@@ -281,7 +312,7 @@ const Controls: React.FC<ControlsProps> = ({
                         {/* Root Picker */}
                         <ScrollablePicker
                             label="Root"
-                            displayValue={selectedRoot}
+                            displayValue={getNoteName(getNoteValue(selectedRoot), useFlats)}
                             items={ROOTS}
                             selectedItem={selectedRoot}
                             onSelect={onRootChange}
@@ -298,7 +329,7 @@ const Controls: React.FC<ControlsProps> = ({
                                             : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-xs lg:text-sm opacity-50 hover:opacity-100'}
                                     `}
                                 >
-                                    {root}
+                                    {getNoteName(getNoteValue(root), useFlats)}
                                 </button>
                             )}
                         />
@@ -340,20 +371,20 @@ const Controls: React.FC<ControlsProps> = ({
                                     }
                                 }}
                                 className={`w-full flex justify-between items-center px-3 py-2 lg:px-4 lg:py-3 rounded-xl border transition-all duration-300 ${showBass
-                                        ? 'bg-[#3a2216] border-[#e6c190] text-[#e6c190] shadow-lg'
-                                        : 'bg-[#1a110b]/40 border-[#3a2216] text-[#c29b6d] hover:bg-[#2a1b12]'
+                                    ? 'bg-[#3a2216] border-[#e6c190] text-[#e6c190] shadow-lg'
+                                    : 'bg-[#1a110b]/40 border-[#3a2216] text-[#c29b6d] hover:bg-[#2a1b12]'
                                     }`}
                             >
                                 <span className="text-xs font-bold uppercase tracking-wide">Slash Bass / Inversion</span>
                                 <span className="text-sm font-mono font-bold opacity-80">
-                                    {selectedBass !== selectedRoot ? `/ ${selectedBass}` : '/ Root'}
+                                    {selectedBass !== selectedRoot ? `/ ${getNoteName(getNoteValue(selectedBass), useFlats)}` : '/ Root'}
                                 </span>
                             </button>
 
                             {showBass && (
                                 <div className="animate-fade-in">
                                     <ScrollablePicker
-                                        items={ROOTS}
+                                        items={chordTones}
                                         selectedItem={selectedBass}
                                         onSelect={onBassChange}
                                         itemKey={(item) => item}
@@ -369,7 +400,7 @@ const Controls: React.FC<ControlsProps> = ({
                                                         : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-[10px] lg:text-xs opacity-50 hover:opacity-100'}
                                                 `}
                                             >
-                                                {root}
+                                                {getNoteName(getNoteValue(root), useFlats)}
                                             </button>
                                         )}
                                     />

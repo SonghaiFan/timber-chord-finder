@@ -21,25 +21,51 @@ const NOTE_MAP: { [key: string]: number } = {
   B: 11,
 };
 
-// Inverse map for display
-const NOTE_NAMES = [
+// Inverse map for display using Unicode musical symbols
+const SHARP_NAMES = [
   "C",
-  "C#",
+  "C\u266f",
   "D",
-  "D#",
+  "D\u266f",
   "E",
   "F",
-  "F#",
+  "F\u266f",
   "G",
-  "G#",
+  "G\u266f",
   "A",
-  "A#",
+  "A\u266f",
   "B",
 ];
 
-export const getNoteValue = (note: string): number => NOTE_MAP[note] ?? 0;
+const FLAT_NAMES = [
+  "C",
+  "D\u266d",
+  "D",
+  "E\u266d",
+  "E",
+  "F",
+  "G\u266d",
+  "G",
+  "A\u266d",
+  "A",
+  "B\u266d",
+  "B",
+];
 
-export const getNoteName = (val: number): string => NOTE_NAMES[val % 12];
+export const getNoteValue = (note: string): number => {
+  // Clean input note string to handle unicode or standard chars
+  const cleanNote = note
+    .replace("\u266f", "#")
+    .replace("\u266d", "b")
+    .replace("sharp", "#")
+    .replace("flat", "b");
+  return NOTE_MAP[cleanNote] ?? 0;
+};
+
+export const getNoteName = (val: number, useFlats: boolean = false): string => {
+  const names = useFlats ? FLAT_NAMES : SHARP_NAMES;
+  return names[val % 12];
+};
 
 // CAGED System Patterns (Offsets relative to the root note on the anchor string)
 // null indicates the string is not typically part of the core shape or is muted in the primary form
@@ -267,18 +293,37 @@ export function generateChords(
 
   // 3. Recursive Search with Pruning
   const rawShapes: number[][] = [];
+  let iterationCount = 0;
+  const maxIterations = 10000; // Safety valve
+  const targetNotesList = Array.from(targetNotes);
+  const fullMask = (1 << targetNotesList.length) - 1;
 
   function search(
     stringIdx: number,
     currentShape: number[],
     minFret: number,
     maxFret: number,
-    hasOpen: boolean
+    hasOpen: boolean,
+    coveredMask: number
   ) {
+    iterationCount++;
+    if (iterationCount > maxIterations) return;
+
     if (stringIdx === numStrings) {
-      rawShapes.push(currentShape);
+      // Final check: all notes must be covered
+      if (coveredMask === fullMask) {
+        rawShapes.push(currentShape);
+      }
       return;
     }
+
+    // Early Pruning: If we need more notes than strings remaining
+    let notesMissing = 0;
+    for (let i = 0; i < targetNotesList.length; i++) {
+      if (!(coveredMask & (1 << i))) notesMissing++;
+    }
+    const stringsRemaining = numStrings - stringIdx;
+    if (notesMissing > stringsRemaining) return;
 
     // Get candidates for this string
     const candidates = validFretsPerString[stringIdx];
@@ -299,6 +344,15 @@ export function generateChords(
       let nextMin = minFret;
       let nextMax = maxFret;
       let nextHasOpen = hasOpen;
+      let nextCoveredMask = coveredMask;
+
+      if (fret !== -1) {
+        const note = (nutTuning[stringIdx] + fret) % 12;
+        const noteIdx = targetNotesList.indexOf(note);
+        if (noteIdx !== -1) {
+          nextCoveredMask |= 1 << noteIdx;
+        }
+      }
 
       if (fret > 0) {
         if (fret < nextMin) nextMin = fret;
@@ -309,52 +363,40 @@ export function generateChords(
         if (nextMax - nextMin > 3) continue;
 
         // Open String Compatibility
-        // If we have open strings, we shouldn't be playing high up the neck.
-        // Standard "Open Chords" usually stay within first 4-5 frets.
         if (nextHasOpen && nextMax > 4) continue;
       }
 
       if (fret === 0) nextHasOpen = true;
-
-      // If we added an open string, and we already have high frets?
       if (fret === 0 && nextMax > 4 && nextMax !== -999) continue;
+
+      // 3. Finger Counting (Playability)
+      // If we have a barre (minFret > 0), we have 3 fingers left for notes > minFret.
+      // If no barre (minFret is 0 or not set), we have 4 fingers for notes > 0.
+      const tempShape = [...currentShape, fret];
+      const frettedNotes = tempShape.filter((f) => f > 0);
+      const effectiveMin = frettedNotes.length ? Math.min(...frettedNotes) : 0;
+      const notesAboveMin = frettedNotes.filter((f) => f > effectiveMin).length;
+
+      if (effectiveMin > 0 && notesAboveMin > 3) continue;
+      if (effectiveMin === 0 && frettedNotes.length > 4) continue;
 
       search(
         stringIdx + 1,
-        [...currentShape, fret],
+        tempShape,
         nextMin,
         nextMax,
-        nextHasOpen
+        nextHasOpen,
+        nextCoveredMask
       );
     }
   }
 
   // Start search
   // minFret starts high, maxFret starts low
-  search(0, [], 999, -999, false);
+  search(0, [], 999, -999, false, 0);
 
   // 4. Validation & Filtering
-  let validChords = rawShapes.filter((shape) => {
-    // Metric: Sounding Strings
-    const sounding = shape.filter((x) => x !== -1);
-
-    // Rule: Minimum strings (Standard 3, Power Chords 2)
-    const minStrings = intervals.length <= 2 ? 2 : 3;
-    if (sounding.length < minStrings) return false;
-
-    // Rule: All target intervals must be present
-    const presentNotes = new Set(
-      shape
-        .map((f, i) => (f === -1 ? -1 : (nutTuning[i] + f) % 12))
-        .filter((x) => x !== -1)
-    );
-
-    for (const t of Array.from(targetNotes)) {
-      if (!presentNotes.has(t)) return false;
-    }
-
-    return true;
-  });
+  let validChords = rawShapes; // Already filtered for target notes in search
 
   // 5. Remove "Lesser" Chords (Subsets)
   // Logic: If chord A is a subset of chord B (same frets where A has notes, but B has more notes),
@@ -410,7 +452,9 @@ export function generateChords(
     // If Root is C, and Shape is C, this is the best.
     const shapeA = identifyCAGEDShape(a, rootVal, nutTuning);
     const shapeB = identifyCAGEDShape(b, rootVal, nutTuning);
-    const rootName = getNoteName(rootVal).replace("#", ""); // Simple match for C, A, G, E, D
+    const rootName = getNoteName(rootVal)
+      .replace("\u266f", "")
+      .replace("\u266d", ""); // Simple match for C, A, G, E, D
 
     const isRootMatchA = shapeA === rootName;
     const isRootMatchB = shapeB === rootName;
