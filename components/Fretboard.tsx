@@ -97,45 +97,69 @@ const Fretboard: React.FC<FretboardProps> = ({
     return () => clearTimeout(timer);
   }, [totalVariations]);
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (totalVariations <= 1) return;
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
-  };
+  // Ref to hold latest props/state for event handlers
+  const stateRef = useRef({ variationIndex, totalVariations, onVariationChange });
+  useEffect(() => {
+    stateRef.current = { variationIndex, totalVariations, onVariationChange };
+  }, [variationIndex, totalVariations, onVariationChange]);
 
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!touchStartRef.current || totalVariations <= 1) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = touch.clientY - touchStartRef.current.y;
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-    // If user is clearly swiping horizontally, prevent vertical scroll jitter.
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 25) {
-      e.preventDefault();
-    }
-  };
+    const onTouchStart = (e: TouchEvent) => {
+      const { totalVariations } = stateRef.current;
+      if (totalVariations <= 1) return;
+      const touch = e.touches[0];
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+    };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start || totalVariations <= 1) return;
+    const onTouchMove = (e: TouchEvent) => {
+      const { totalVariations } = stateRef.current;
+      if (!touchStartRef.current || totalVariations <= 1) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchStartRef.current.x;
+      const dy = touch.clientY - touchStartRef.current.y;
 
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
-    const dt = Date.now() - start.time;
-
-    const horizontalSwipe = Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) && dt < 800;
-
-    if (horizontalSwipe) {
-      if (dx < 0) {
-        onVariationChange((variationIndex + 1) % totalVariations);
-      } else {
-        onVariationChange((variationIndex - 1 + totalVariations) % totalVariations);
+      // If user is clearly swiping horizontally, prevent vertical scroll jitter.
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 25) {
+        if (e.cancelable) e.preventDefault();
       }
-      setShowSwipeHint(false);
-    }
-  };
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const { variationIndex, totalVariations, onVariationChange } = stateRef.current;
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!start || totalVariations <= 1) return;
+
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      const dt = Date.now() - start.time;
+
+      const horizontalSwipe = Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) && dt < 800;
+
+      if (horizontalSwipe) {
+        if (dx < 0) {
+          onVariationChange((variationIndex + 1) % totalVariations);
+        } else {
+          onVariationChange((variationIndex - 1 + totalVariations) % totalVariations);
+        }
+        setShowSwipeHint(false);
+      }
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
 
   // Auto-scroll logic
   useEffect(() => {
