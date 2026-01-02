@@ -358,11 +358,10 @@ const Controls: React.FC<ControlsProps> = ({
                                                 Var {idx + 1}
                                             </span>
                                             {v.cagedShape && (
-                                                <span className={`text-[9px] font-bold px-1.5 rounded border ${
-                                                    variationIndex === idx 
-                                                    ? 'border-[#2a1b12] text-[#2a1b12]' 
-                                                    : 'border-[#c29b6d]/50 text-[#c29b6d]'
-                                                }`}>
+                                                <span className={`text-[9px] font-bold px-1.5 rounded border ${variationIndex === idx
+                                                        ? 'border-[#2a1b12] text-[#2a1b12]'
+                                                        : 'border-[#c29b6d]/50 text-[#c29b6d]'
+                                                    }`}>
                                                     {v.cagedShape}-Shape
                                                 </span>
                                             )}

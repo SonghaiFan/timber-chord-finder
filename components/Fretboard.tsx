@@ -354,6 +354,33 @@ const Fretboard: React.FC<FretboardProps> = ({
                 />
               ))}
 
+              {/* CAGED Shape Connections */}
+              {variation && variation.cagedShape && (
+                <svg className="absolute inset-0 w-full h-full z-30 pointer-events-none">
+                  <polyline
+                    points={variation.frets
+                      .map((fret, stringIdx) => {
+                        if (fret === -1) return null;
+                        const absoluteFret = fret >= 0 ? fret + capo : -1;
+                        
+                        // Skip open strings for the connection line
+                        if (absoluteFret === 0) return null;
+
+                        const x = getStringX(stringIdx);
+                        const y = getFretY(absoluteFret) - (fretSpacing / 2); // Match Fretted Marker
+                        return `${x},${y}`;
+                      })
+                      .filter(Boolean)
+                      .join(' ')}
+                    fill="none"
+                    stroke="rgba(230, 193, 144, 0.4)"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+
               {/* Note Markers */}
               {variation && variation.frets.map((fret, stringIdx) => {
                 const xPos = getStringX(stringIdx);

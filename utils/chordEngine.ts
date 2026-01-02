@@ -1,4 +1,4 @@
-import { ChordVariation } from '../types';
+import { ChordVariation } from "../types";
 
 // Note Map for converting Root Note strings to integers (0-11)
 const NOTE_MAP: { [key: string]: number } = {
@@ -90,8 +90,8 @@ function getCAGEDScore(
     if (diff < 0) diff += 12;
     intervals.push(diff);
   }
-  
-  const isStandard = 
+
+  const isStandard =
     intervals[0] === 5 &&
     intervals[1] === 5 &&
     intervals[2] === 5 &&
@@ -144,10 +144,10 @@ function getCAGEDScore(
           score -= 1; // Penalty for deviation
         }
       }
-      
+
       // Bonus for identifying the shape
-      if (matches >= 3) { 
-         if (score > maxScore) maxScore = score;
+      if (matches >= 3) {
+        if (score > maxScore) maxScore = score;
       }
     }
   }
@@ -167,8 +167,8 @@ function identifyCAGEDShape(
     if (diff < 0) diff += 12;
     intervals.push(diff);
   }
-  
-  const isStandard = 
+
+  const isStandard =
     intervals[0] === 5 &&
     intervals[1] === 5 &&
     intervals[2] === 5 &&
@@ -217,12 +217,12 @@ function identifyCAGEDShape(
           score -= 1;
         }
       }
-      
-      if (matches >= 3) { 
-         if (score > maxScore) {
-             maxScore = score;
-             bestShape = pattern.name;
-         }
+
+      if (matches >= 3) {
+        if (score > maxScore) {
+          maxScore = score;
+          bestShape = pattern.name;
+        }
       }
     }
   }
@@ -406,7 +406,7 @@ export function generateChords(
     const bMin = getMinFret(b);
 
     // Helper: Get Finger Count (Fretted notes > 0)
-    const getFingerCount = (s: number[]) => s.filter(f => f > 0).length;
+    const getFingerCount = (s: number[]) => s.filter((f) => f > 0).length;
     const fingersA = getFingerCount(a);
     const fingersB = getFingerCount(b);
 
@@ -423,8 +423,8 @@ export function generateChords(
     // If Root is C, and Shape is C, this is the best.
     const shapeA = identifyCAGEDShape(a, rootVal, nutTuning);
     const shapeB = identifyCAGEDShape(b, rootVal, nutTuning);
-    const rootName = getNoteName(rootVal).replace('#', ''); // Simple match for C, A, G, E, D
-    
+    const rootName = getNoteName(rootVal).replace("#", ""); // Simple match for C, A, G, E, D
+
     const isRootMatchA = shapeA === rootName;
     const isRootMatchB = shapeB === rootName;
 
@@ -465,18 +465,18 @@ export function generateChords(
     return getMuteScore(a) - getMuteScore(b);
   });
 
-  return validChords.map(shape => {
-      const frets = shape.filter(f => f > 0);
-      const minFret = frets.length ? Math.min(...frets) : 0;
-      // If minFret is > 0, we might want to show baseFret as minFret.
-      // But usually baseFret is 1 unless we are high up.
-      // Let's say if minFret > 2, baseFret = minFret.
-      const baseFret = minFret > 2 ? minFret : 1;
-      
-      return {
-          frets: shape,
-          baseFret: baseFret,
-          cagedShape: identifyCAGEDShape(shape, rootVal, nutTuning)
-      };
+  return validChords.map((shape) => {
+    const frets = shape.filter((f) => f > 0);
+    const minFret = frets.length ? Math.min(...frets) : 0;
+    // If minFret is > 0, we might want to show baseFret as minFret.
+    // But usually baseFret is 1 unless we are high up.
+    // Let's say if minFret > 2, baseFret = minFret.
+    const baseFret = minFret > 2 ? minFret : 1;
+
+    return {
+      frets: shape,
+      baseFret: baseFret,
+      cagedShape: identifyCAGEDShape(shape, rootVal, nutTuning),
+    };
   });
 }
