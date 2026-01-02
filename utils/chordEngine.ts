@@ -226,6 +226,7 @@ export function generateChords(
 ): ChordVariation[] {
   const numStrings = 6;
   const maxFretSearch = 15; // Max fret to look for
+  const maxPhysicalFret = 22; // Physical limit of the guitar neck
 
   // 1. Prepare Targets
   const targetNotes = new Set(intervals.map((i) => (rootVal + i) % 12));
@@ -251,8 +252,11 @@ export function generateChords(
       valid.push(0);
     }
 
-    // Frets 1..maxFretSearch
-    for (let f = 1; f <= maxFretSearch; f++) {
+    // Calculate max relative fret allowed by physical neck length
+    const effectiveMaxFret = Math.min(maxFretSearch, maxPhysicalFret - capo);
+
+    // Frets 1..effectiveMaxFret
+    for (let f = 1; f <= effectiveMaxFret; f++) {
       const note = (nutTuning[s] + f) % 12;
       if (targetNotes.has(note)) {
         valid.push(f);
