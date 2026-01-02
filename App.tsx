@@ -39,10 +39,10 @@ const App: React.FC = () => {
   }, [root, quality, bass, tuning, capo]);
 
   const currentVariation = variations[variationIndex] || null;
-  
+
   // Determine whether to use flats or sharps
-  const useFlats = preferFlats !== null 
-    ? preferFlats 
+  const useFlats = preferFlats !== null
+    ? preferFlats
     : (root.includes('b') || root.includes('\u266d'));
 
   const rootName = getNoteName(getNoteValue(root), useFlats);

@@ -219,8 +219,8 @@ const Controls: React.FC<ControlsProps> = ({
     const [isExpanded, setIsExpanded] = useState(true);
     const [showBass, setShowBass] = useState(false);
 
-    const useFlats = preferFlats !== null 
-        ? preferFlats 
+    const useFlats = preferFlats !== null
+        ? preferFlats
         : (selectedRoot.includes('b') || selectedRoot.includes('\u266d'));
 
     const chordTones = useMemo(() => {
