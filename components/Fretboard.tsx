@@ -184,7 +184,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 
             {/* The Guitar Neck */}
             <div
-              className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none rounded-b-lg overflow-hidden"
+              className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none rounded-b-lg"
               style={{
                 width: `${boardWidth}px`,
                 height: `${boardHeight + headstockHeight}px`,
@@ -195,7 +195,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 
               {/* Headstock Area */}
               <div
-                className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-10 border-b-4 border-[#1a110b]"
+                className="sticky top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-50 border-b-4 border-[#1a110b]"
                 style={{ height: `${headstockHeight}px` }}
               >
                 <div className="absolute bottom-0 left-0 right-0 h-[14px] bg-gradient-to-b from-[#f4f1ea] to-[#dcd8cc] border-b border-[#999] shadow-md z-20" />
