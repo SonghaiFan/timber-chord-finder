@@ -502,8 +502,10 @@ const Fretboard: React.FC<FretboardProps> = ({
                           transform: 'translate(-50%, -50%)'
                         }}
                       >
-                        <div className="w-5 h-5 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
-                          <span className="text-[9px] font-bold text-[#555]">{getNoteLabel(pitch)}</span>
+                        <div className="w-6 h-6 rounded-full bg-[#1a110b]/90 flex items-center justify-center shadow-sm backdrop-blur-sm border border-[#3a2216]">
+                          <span className="text-[10px] font-black text-[#777] leading-none flex items-center justify-center" style={{ transform: 'translateY(0.5px)' }}>
+                            {getNoteLabel(pitch)}
+                          </span>
                         </div>
                       </button>
                     );
@@ -550,8 +552,10 @@ const Fretboard: React.FC<FretboardProps> = ({
                           transform: 'translate(-50%, -50%)'
                         }}
                       >
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm ${isRoot ? 'bg-[#e6c190]/40' : 'bg-[#c29b6d]/20'}`}>
-                          <span className={`text-[9px] font-bold ${isRoot ? 'text-[#e6c190]' : 'text-[#c29b6d]'}`}>{getNoteLabel(pitch)}</span>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm ${isRoot ? 'bg-[#e6c190]/40' : 'bg-[#c29b6d]/20'}`}>
+                          <span className={`text-[10px] font-black leading-none flex items-center justify-center ${isRoot ? 'text-[#e6c190]' : 'text-[#c29b6d]'}`} style={{ transform: 'translateY(0.5px)' }}>
+                            {getNoteLabel(pitch)}
+                          </span>
                         </div>
                       </button>
                     );
@@ -663,7 +667,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                           boxShadow: isRoot ? '0 0 15px rgba(230,193,144,0.4)' : '0 0 10px rgba(194,155,109,0.4)'
                         }}
                       >
-                        <span className="font-bold text-xs">{noteName}</span>
+                        <span className="font-black text-xs leading-none flex items-center justify-center" style={{ transform: 'translateY(0.5px)' }}>{noteName}</span>
                       </div>
                     </button>
                   );
@@ -693,7 +697,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                           : '0 0 10px rgba(194,155,109,0.4)',
                       }}
                     >
-                      <span className="font-bold font-sans text-lg z-10 leading-none">
+                      <span className="font-black font-sans text-lg z-10 leading-none flex items-center justify-center tracking-tighter" style={{ transform: 'translateY(0.5px)' }}>
                         {noteName}
                       </span>
                     </div>
