@@ -258,9 +258,6 @@ const Fretboard: React.FC<FretboardProps> = ({
 
         <div
           ref={scrollContainerRef}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
           style={{ touchAction: 'pan-y' }}
           className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl  shadow-2xl relative"
         >
@@ -484,7 +481,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                   return (
                     <div
                       key={`marker-mute-${stringIdx}`}
-                      className="absolute flex items-center justify-center z-40"
+                      className="absolute flex items-center justify-center z-[60]"
                       style={{
                         top: `${headstockHeight - 65}px`,
                         left: `${xPos}px`,
@@ -502,7 +499,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                   return (
                     <div
                       key={`marker-open-${stringIdx}`}
-                      className="absolute flex items-center justify-center z-40"
+                      className="absolute flex items-center justify-center z-[60]"
                       style={{
                         top: `${headstockHeight - 50}px`,
                         left: `${xPos}px`,
