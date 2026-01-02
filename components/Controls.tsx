@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { ROOTS, CHORD_TYPES, TUNINGS, CAPO_POSITIONS } from '../constants';
-import { RootNote, ChordType, TuningDefinition } from '../types';
+import { RootNote, ChordType, TuningDefinition, ChordVariation } from '../types';
 
 interface ControlsProps {
     selectedRoot: RootNote;
@@ -12,7 +12,7 @@ interface ControlsProps {
     isLefty: boolean;
     showAllNotes: boolean;
     showIntervals: boolean;
-    variations: number[][];
+    variations: ChordVariation[];
     variationIndex: number;
     onRootChange: (root: RootNote) => void;
     onQualityChange: (quality: ChordType) => void;
@@ -121,8 +121,8 @@ const Controls: React.FC<ControlsProps> = ({
         }, 100);
     };
 
-    const formatVariation = (v: number[]) => {
-        return v.map(n => n === -1 ? 'x' : n).join(' ');
+    const formatVariation = (v: ChordVariation) => {
+        return v.frets.map(n => n === -1 ? 'x' : n).join(' ');
     };
 
     return (
@@ -357,7 +357,16 @@ const Controls: React.FC<ControlsProps> = ({
                                             <span className={`text-[10px] font-bold uppercase tracking-wider ${variationIndex === idx ? 'text-[#2a1b12]' : 'text-[#666] group-hover:text-[#c29b6d]'}`}>
                                                 Var {idx + 1}
                                             </span>
-                                            {variationIndex === idx && <span className="w-1.5 h-1.5 rounded-full bg-[#2a1b12]"></span>}
+                                            {v.cagedShape && (
+                                                <span className={`text-[9px] font-bold px-1.5 rounded border ${
+                                                    variationIndex === idx 
+                                                    ? 'border-[#2a1b12] text-[#2a1b12]' 
+                                                    : 'border-[#c29b6d]/50 text-[#c29b6d]'
+                                                }`}>
+                                                    {v.cagedShape}-Shape
+                                                </span>
+                                            )}
+                                            {variationIndex === idx && !v.cagedShape && <span className="w-1.5 h-1.5 rounded-full bg-[#2a1b12]"></span>}
                                         </div>
                                         <div className={`font-mono text-sm tracking-widest ${variationIndex === idx ? 'font-bold' : ''}`}>
                                             {formatVariation(v)}

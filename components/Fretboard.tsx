@@ -1,13 +1,13 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { TuningDefinition } from '../types';
+import { TuningDefinition, ChordVariation } from '../types';
 import { getNoteName, getNoteValue } from '../utils/chordEngine';
 import { CHORD_TYPES } from '../constants';
 
 interface FretboardProps {
   chordName: string;
   formula: string;
-  variation: number[] | null;
+  variation: ChordVariation | null;
   tuning: TuningDefinition;
   capo: number;
   isLefty: boolean;
@@ -88,7 +88,7 @@ const Fretboard: React.FC<FretboardProps> = ({
   useEffect(() => {
     if (variation && scrollContainerRef.current) {
       // Calculate visible frets (absolute)
-      const absoluteFrets = variation
+      const absoluteFrets = variation.frets
         .filter(f => f >= 0)
         .map(f => (f === 0 && capo === 0) ? 0 : f + capo); // If open string no capo, 0. If open string with capo, absolute fret is capo.
 
@@ -140,7 +140,7 @@ const Fretboard: React.FC<FretboardProps> = ({
         <div className="relative z-10 flex gap-2 text-xs border-t border-[#ddd] pt-1">
           <span className="font-bold text-[#666]">Notes:</span>
           <span className="font-mono text-[#2a1b12]">
-            {variation?.map((f, i) => {
+            {variation?.frets.map((f, i) => {
               if (f < 0) return null;
               const pitch = tuning.offsets[i] + capo + f;
               return getNoteName(pitch);
@@ -308,7 +308,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                     // If variation is -1 (mute), we might still want to show the ghost note?
                     // If variation is defined and matches this physical fret, don't show ghost.
 
-                    const isMainNote = variation && (variation[stringIdx] !== -1) && (variation[stringIdx] + capo === physicalFret);
+                    const isMainNote = variation && (variation.frets[stringIdx] !== -1) && (variation.frets[stringIdx] + capo === physicalFret);
                     if (isMainNote) return null;
 
                     const xPos = getStringX(stringIdx);
@@ -355,7 +355,7 @@ const Fretboard: React.FC<FretboardProps> = ({
               ))}
 
               {/* Note Markers */}
-              {variation && variation.map((fret, stringIdx) => {
+              {variation && variation.frets.map((fret, stringIdx) => {
                 const xPos = getStringX(stringIdx);
                 // Pitch calculation
                 const pitch = tuning.offsets[stringIdx] + capo + (fret === -1 ? 0 : fret);

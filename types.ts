@@ -25,6 +25,7 @@ export type RootNote = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' |
 export interface ChordVariation {
   frets: number[]; // Array of 6 integers. -1 = mute, 0 = open
   baseFret: number; // The lowest fret number shown (for calculating relative position)
+  cagedShape?: string; // 'C', 'A', 'G', 'E', 'D' or undefined
 }
 
 export interface TuningDefinition {
