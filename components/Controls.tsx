@@ -348,13 +348,12 @@ const Controls: React.FC<ControlsProps> = ({
                                 </div>
                             )}
                         </div>
-
                         {/* Variations List */}
-                        <div className="flex-1 min-h-[100px] lg:min-h-0 flex flex-col gap-1 lg:gap-3">
+                        <div className="flex-1 min-h-0 flex flex-col gap-1 lg:gap-3">
                             <div className="flex justify-between items-baseline border-b border-[#3a2216] pb-2 mt-2 lg:mt-4">
                                 <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">Variations ({variations.length})</span>
                             </div>
-                            <div className="grid grid-cols-5 lg:grid-cols-2 gap-2 overflow-y-auto max-h-[150px] lg:max-h-none lg:flex-1 pr-1 custom-scrollbar pb-2">
+                            <div className="grid grid-cols-5 lg:grid-cols-2 gap-2 overflow-y-auto flex-1 pr-1 custom-scrollbar pb-2">
                                 {variations.length === 0 ? (
                                     <div className="col-span-5 lg:col-span-2 text-center text-[#666] text-xs py-8 italic">No variations found.</div>
                                 ) : (
@@ -362,27 +361,21 @@ const Controls: React.FC<ControlsProps> = ({
                                         <button
                                             key={idx}
                                             onClick={() => onVariationSelect(idx)}
-                                            className={`
-                                text-left px-0 py-2 lg:px-4 lg:py-3 rounded-lg border transition-all duration-200 group relative overflow-hidden flex items-center justify-center lg:block
-                                ${variationIndex === idx
+                                            className={`text-left px-0 lg:px-4 rounded-lg border transition-all duration-200 group relative overflow-hidden flex items-center justify-center lg:flex lg:flex-col lg:justify-center h-10 lg:h-[4.5rem] ${variationIndex === idx
                                                     ? 'bg-[#e6c190] border-[#e6c190] text-[#2a1b12] shadow-lg'
-                                                    : 'bg-[#1a110b]/40 border-[#3a2216] text-[#888] hover:border-[#6b4e3d] hover:bg-[#2a1b12]'}
-                            `}
+                                                    : 'bg-[#1a110b]/40 border-[#3a2216] text-[#888] hover:border-[#6b4e3d] hover:bg-[#2a1b12]'
+                                                }`}
                                         >
                                             {/* Mobile: Simple Number */}
                                             <span className="lg:hidden text-sm font-bold">{idx + 1}</span>
-
                                             {/* Desktop: Full Details */}
-                                            <div className="hidden lg:block">
+                                            <div className="hidden lg:block w-full">
                                                 <div className="flex justify-between items-center mb-1">
                                                     <span className={`text-[10px] font-bold uppercase tracking-wider ${variationIndex === idx ? 'text-[#2a1b12]' : 'text-[#666] group-hover:text-[#c29b6d]'}`}>
                                                         Var {idx + 1}
                                                     </span>
                                                     {v.cagedShape && (
-                                                        <span className={`text-[9px] font-bold px-1.5 rounded border ${variationIndex === idx
-                                                            ? 'border-[#2a1b12] text-[#2a1b12]'
-                                                            : 'border-[#c29b6d]/50 text-[#c29b6d]'
-                                                            }`}>
+                                                        <span className={`text-[9px] font-bold px-1.5 rounded border ${variationIndex === idx ? 'border-[#2a1b12] text-[#2a1b12]' : 'border-[#c29b6d]/50 text-[#c29b6d]'}`}>
                                                             {v.cagedShape}-Shape
                                                         </span>
                                                     )}
@@ -399,7 +392,6 @@ const Controls: React.FC<ControlsProps> = ({
                         </div>
                     </div>
                 )}
-
             </div>
         </div>
     );
