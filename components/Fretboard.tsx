@@ -35,6 +35,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 }) => {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(totalVariations > 1);
+  const [viewHeight, setViewHeight] = useState(0);
 
   // Calculate target notes (pitch classes)
   const { targetNotes, rootVal } = useMemo(() => {
@@ -65,13 +66,18 @@ const Fretboard: React.FC<FretboardProps> = ({
   };
 
   // Config for Vertical Fretboard
-  const totalFrets = 22;
+  const headstockHeight = 80;
+  const fretSpacing = 50;
+  const minFrets = 22;
+  
+  // Calculate total frets to fill the view height
+  const fretsToFill = viewHeight > 0 ? Math.ceil((viewHeight - headstockHeight) / fretSpacing) : 0;
+  const totalFrets = Math.max(minFrets, fretsToFill);
+
   const stringNames = tuning.offsets.map(offset => getNoteName(offset));
 
   // Dimensions
   const boardWidth = 280;
-  const headstockHeight = 80;
-  const fretSpacing = 50;
   const boardHeight = totalFrets * fretSpacing;
 
   const getStringX = (index: number) => {
@@ -106,6 +112,14 @@ const Fretboard: React.FC<FretboardProps> = ({
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+
+    // Resize Observer to update viewHeight
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setViewHeight(entry.contentRect.height);
+      }
+    });
+    resizeObserver.observe(container);
 
     const onTouchStart = (e: TouchEvent) => {
       const { totalVariations } = stateRef.current;
@@ -155,6 +169,7 @@ const Fretboard: React.FC<FretboardProps> = ({
     container.addEventListener('touchend', onTouchEnd, { passive: true });
 
     return () => {
+      resizeObserver.disconnect();
       container.removeEventListener('touchstart', onTouchStart);
       container.removeEventListener('touchmove', onTouchMove);
       container.removeEventListener('touchend', onTouchEnd);
@@ -300,7 +315,7 @@ const Fretboard: React.FC<FretboardProps> = ({
 
               {/* Headstock Area */}
               <div
-                className="sticky top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-50 border-b-4 border-[#1a110b]"
+                className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#1a110b] to-[#2a1b12] z-50 border-b-4 border-[#1a110b]"
                 style={{ height: `${headstockHeight}px` }}
               >
                 <div className="absolute bottom-0 left-0 right-0 h-[14px] bg-gradient-to-b from-[#f4f1ea] to-[#dcd8cc] border-b border-[#999] shadow-md z-20" />
