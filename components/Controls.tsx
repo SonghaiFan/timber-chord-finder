@@ -212,9 +212,9 @@ const Controls: React.FC<ControlsProps> = ({
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar px-4 lg:px-8 pb-12 lg:pb-16 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
+            <div className={`flex-1 flex flex-col min-h-0 px-4 lg:px-8 pb-12 lg:pb-16 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
                 {activeTab === 'settings' ? (
-                    <div className="space-y-6 lg:space-y-8 animate-fade-in">
+                    <div className="space-y-6 lg:space-y-8 animate-fade-in overflow-y-auto flex-1 custom-scrollbar pr-2">
                         <div className="bg-[#0a0705]/60 backdrop-blur-xl p-4 lg:p-6 rounded-2xl lg:rounded-[2rem] shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-1 gap-4 lg:gap-6">
                             <Select
                                 label="Instrument Tuning"
@@ -254,11 +254,9 @@ const Controls: React.FC<ControlsProps> = ({
                                 <Toggle id="showIntervals" label="Interval Labels" checked={showIntervals} onChange={onShowIntervalsChange} />
                             </div>
                         </div>
-                        {/* Bottom Spacer to avoid screw overlap */}
-                        <div className="h-20 lg:h-32 flex-shrink-0 pointer-events-none" />
                     </div>
                 ) : (
-                    <div className="space-y-4 lg:space-y-10 animate-fade-in h-full flex flex-col">
+                    <div className="space-y-4 lg:space-y-10 animate-fade-in flex-1 flex flex-col min-h-0">
                         {/* Root Picker */}
                         <HorizontalWheelRoller
                             label="Root Frequency"
@@ -345,8 +343,6 @@ const Controls: React.FC<ControlsProps> = ({
                                 )}
                             </div>
                         </div>
-                        {/* Bottom Spacer to avoid screw overlap */}
-                        <div className="h-20 lg:h-32 flex-shrink-0 pointer-events-none" />
                     </div>
                 )}
             </div>
