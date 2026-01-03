@@ -65,7 +65,7 @@ const App: React.FC = () => {
 
         {/* Left Column: Controls */}
         {/* Mobile: Dynamic height based on expansion. Desktop: Full height. */}
-        <div className="flex-shrink-0 w-full lg:w-[360px] max-h-[50vh] lg:max-h-full lg:h-full flex flex-col min-h-0 transition-all duration-500 ease-in-out">
+        <div className="flex-shrink-0 w-full lg:w-[360px] max-h-[60vh] lg:max-h-full lg:h-full flex flex-col min-h-0 transition-all duration-500 ease-in-out">
           <Controls
             selectedRoot={root}
             selectedQuality={quality}

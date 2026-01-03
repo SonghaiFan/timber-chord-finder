@@ -132,6 +132,29 @@ const Controls: React.FC<ControlsProps> = ({
     const [activeTab, setActiveTab] = useState<'finder' | 'settings'>('finder');
     const [isExpanded, setIsExpanded] = useState(true);
 
+    const outerScrollRef = useRef<HTMLDivElement>(null);
+    const innerScrollRef = useRef<HTMLDivElement>(null);
+
+    const handleOuterWheel = (e: React.WheelEvent) => {
+        const outer = outerScrollRef.current;
+        const inner = innerScrollRef.current;
+        if (!outer || !inner) return;
+
+        const isOuterAtBottom = Math.abs(outer.scrollHeight - outer.clientHeight - outer.scrollTop) < 1;
+        const isInnerAtTop = inner.scrollTop === 0;
+        const isOverInner = inner.contains(e.target as Node);
+
+        // If scrolling down and outer is at bottom, and we are NOT over the inner container, scroll inner
+        if (e.deltaY > 0 && isOuterAtBottom && !isOverInner) {
+            inner.scrollTop += e.deltaY;
+        }
+
+        // If scrolling up and inner is at top, and we are over the inner container, scroll outer
+        if (e.deltaY < 0 && isInnerAtTop && isOverInner) {
+            outer.scrollTop += e.deltaY;
+        }
+    };
+
     const useFlats = preferFlats !== null
         ? preferFlats
         : (selectedRoot.includes('b') || selectedRoot.includes('\u266d'));
@@ -154,14 +177,6 @@ const Controls: React.FC<ControlsProps> = ({
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-40 pointer-events-none mix-blend-overlay" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/40 pointer-events-none" />
 
-            {/* Corner Screws - More 3D */}
-            <div className="absolute top-3 left-4 lg:top-6 lg:left-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
-            </div>
-            <div className="absolute top-3 right-4 lg:top-6 lg:right-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] -rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
-            </div>
-
             {/* Speaker Grille Section*/}
             <div className="absolute top-0 left-0 right-0 h-24 lg:h-32 bg-[#120c08] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] overflow-hidden z-0">
                 <div className="absolute inset-0 opacity-50" style={{
@@ -173,15 +188,15 @@ const Controls: React.FC<ControlsProps> = ({
 
             {/* Header & Tabs */}
             <div className="flex flex-col z-10 bg-transparent">
-                <div className="flex items-center justify-between p-6 lg:p-10 pb-4 lg:pb-6">
+                <div className="flex items-center justify-between p-4 lg:p-10 pb-2 lg:pb-6">
                     <div className="relative">
                         <div className="absolute -inset-4 bg-[#e6c190] blur-xl opacity-5 rounded-full" />
-                        <h1 className="text-2xl lg:text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                        <h1 className="text-xl lg:text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                             FSH<span className="text-[#c29b6d]">GUITAR</span>
                         </h1>
-                        <div className="flex items-center gap-3 mt-1.5 lg:mt-2">
+                        <div className="flex items-center gap-3 mt-1 lg:mt-2">
                             <div className="h-[1px] w-4 lg:w-6 bg-gradient-to-r from-transparent to-[#c29b6d]/40" />
-                            <span className="text-[7px] lg:text-[8px] text-[#c29b6d] font-black tracking-[0.4em] uppercase opacity-80">Precision Audio Gear</span>
+                            <span className="text-[6px] lg:text-[8px] text-[#c29b6d] font-black tracking-[0.4em] uppercase opacity-80">Precision Audio Gear</span>
                             <div className="h-[1px] w-4 lg:w-6 bg-gradient-to-l from-transparent to-[#c29b6d]/40" />
                         </div>
                     </div>
@@ -192,16 +207,16 @@ const Controls: React.FC<ControlsProps> = ({
                         </div>
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="lg:hidden p-2.5 text-[#e6c190] bg-[#1a110b] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.1)] active:translate-y-0.5 transition-all"
+                            className="lg:hidden p-2 text-[#e6c190] bg-[#1a110b] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.1)] active:translate-y-0.5 transition-all"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 lg:h-5 lg:w-5 transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <div className="flex px-8 gap-4 mb-6">
+                <div className="flex px-6 lg:px-8 gap-3 lg:gap-4 mb-4 lg:mb-6">
                     <TabButton active={activeTab === 'finder'} onClick={() => { setActiveTab('finder'); setIsExpanded(true); }}>
                         Tuning
                     </TabButton>
@@ -212,9 +227,12 @@ const Controls: React.FC<ControlsProps> = ({
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 flex flex-col min-h-0 px-4 lg:px-8 pb-12 lg:pb-16 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
+            <div className={`flex-1 flex flex-col min-h-0 px-4 lg:px-8 pb-6 lg:pb-16 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
                 {activeTab === 'settings' ? (
-                    <div className="space-y-6 lg:space-y-8 animate-fade-in overflow-y-auto flex-1 custom-scrollbar pr-2">
+                    <div
+                        ref={outerScrollRef}
+                        className="space-y-6 lg:space-y-8 animate-fade-in overflow-y-auto flex-1 custom-scrollbar pr-2 pb-12 lg:pb-0"
+                    >
                         <div className="bg-[#0a0705]/60 backdrop-blur-xl p-4 lg:p-6 rounded-2xl lg:rounded-[2rem] shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-1 gap-4 lg:gap-6">
                             <Select
                                 label="Instrument Tuning"
@@ -256,7 +274,11 @@ const Controls: React.FC<ControlsProps> = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-4 lg:space-y-10 animate-fade-in flex-1 flex flex-col min-h-0">
+                    <div
+                        ref={outerScrollRef}
+                        onWheel={handleOuterWheel}
+                        className="space-y-4 lg:space-y-10 animate-fade-in flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar pr-2 pb-12 lg:pb-0"
+                    >
                         {/* Root Picker */}
                         <HorizontalWheelRoller
                             label="Root Frequency"
@@ -304,7 +326,10 @@ const Controls: React.FC<ControlsProps> = ({
                                     <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00]/20" />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 overflow-y-auto flex-1 pr-2 custom-scrollbar pb-4 pt-2 content-start">
+                            <div
+                                ref={innerScrollRef}
+                                className="grid grid-cols-2 gap-3 overflow-y-auto flex-1 pr-2 custom-scrollbar pb-24 pt-2 content-start"
+                            >
                                 {variations.length === 0 ? (
                                     <div className="col-span-2 text-center text-[#444] text-[9px] py-10 font-black uppercase tracking-[0.4em] italic bg-[#050302] rounded-2xl shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
                                         No Signal Detected
