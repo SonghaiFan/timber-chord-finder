@@ -39,7 +39,6 @@ const Fretboard: React.FC<FretboardProps> = ({
   onVariationChange
 }) => {
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const [showSwipeHint, setShowSwipeHint] = useState(totalVariations > 1);
   const [viewHeight, setViewHeight] = useState(0);
 
   // Calculate target notes (pitch classes)
@@ -115,16 +114,6 @@ const Fretboard: React.FC<FretboardProps> = ({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (totalVariations <= 1) {
-      setShowSwipeHint(false);
-      return;
-    }
-    setShowSwipeHint(true);
-    const timer = setTimeout(() => setShowSwipeHint(false), 4000);
-    return () => clearTimeout(timer);
-  }, [totalVariations]);
-
   // Ref to hold latest props/state for event handlers
   const stateRef = useRef({ variationIndex, totalVariations, onVariationChange });
   useEffect(() => {
@@ -182,7 +171,6 @@ const Fretboard: React.FC<FretboardProps> = ({
         } else {
           onVariationChange((variationIndex - 1 + totalVariations) % totalVariations);
         }
-        setShowSwipeHint(false);
       }
     };
 
@@ -277,12 +265,6 @@ const Fretboard: React.FC<FretboardProps> = ({
         </div>
       </div>
 
-      {totalVariations > 1 && showSwipeHint && (
-        <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 z-50 px-3 py-1 rounded-full bg-[#1a110b]/80 border border-[#3a2216] shadow-lg backdrop-blur-sm text-[11px] font-bold uppercase tracking-widest text-[#e6c190] flex items-center gap-2 pointer-events-none">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#e6c190] animate-pulse"></span>
-          Swipe for shapes
-        </div>
-      )}
 
       {/* Fretboard Container with Arrows */}
       <div className="flex-1 relative min-h-0 group/board">
