@@ -84,7 +84,6 @@ const App: React.FC = () => {
             onCapoChange={setCapo}
             onLeftyChange={setIsLefty}
             onPreferFlatsChange={setPreferFlats}
-            showAllNotes={showAllNotes}
             onShowAllNotesChange={setShowAllNotes}
             selectedScale={selectedScale}
             onScaleChange={setSelectedScale}
