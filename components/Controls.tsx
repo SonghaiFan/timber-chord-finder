@@ -177,7 +177,7 @@ const Controls: React.FC<ControlsProps> = ({
                     <div className="relative">
                         <div className="absolute -inset-4 bg-[#e6c190] blur-xl opacity-5 rounded-full" />
                         <h1 className="text-2xl lg:text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                            AXE<span className="text-[#c29b6d]">GRAIN</span>
+                            FSH<span className="text-[#c29b6d]">GUITAR</span>
                         </h1>
                         <div className="flex items-center gap-3 mt-1.5 lg:mt-2">
                             <div className="h-[1px] w-4 lg:w-6 bg-gradient-to-r from-transparent to-[#c29b6d]/40" />
