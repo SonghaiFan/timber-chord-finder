@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { ROOTS, CHORD_TYPES, TUNINGS, CAPO_POSITIONS, SCALES } from '../constants';
 import { RootNote, ChordType, TuningDefinition, ChordVariation, ScaleDefinition } from '../types';
 import { getNoteValue, getNoteName } from '../utils/chordEngine';
+import HorizontalWheelRoller from './HorizontalWheelRoller';
 
 // --- Types ---
 
@@ -34,108 +35,6 @@ interface ControlsProps {
 
 // --- Helper Components ---
 
-interface ScrollablePickerProps<T> {
-    label?: string;
-    displayValue?: string;
-    items: T[];
-    selectedItem: T;
-    onSelect: (item: T) => void;
-    itemKey: (item: T) => string | number;
-    renderItem: (item: T, isSelected: boolean) => React.ReactNode;
-    className?: string;
-}
-
-function ScrollablePicker<T>({
-    label,
-    displayValue,
-    items,
-    selectedItem,
-    onSelect,
-    itemKey,
-    renderItem,
-    className = ""
-}: ScrollablePickerProps<T>) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Center active item on change
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        const activeItem = container.querySelector('[data-active="true"]') as HTMLElement;
-        if (activeItem) {
-            const containerCenter = container.scrollLeft + container.clientWidth / 2;
-            const itemCenter = activeItem.offsetLeft + activeItem.offsetWidth / 2;
-            if (Math.abs(containerCenter - itemCenter) < 10) return;
-            activeItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-    }, [selectedItem]);
-
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const container = e.currentTarget;
-        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-
-        scrollTimeout.current = setTimeout(() => {
-            const containerCenter = container.scrollLeft + container.clientWidth / 2;
-            let closestItem = null;
-            let minDiff = Infinity;
-
-            Array.from(container.children).forEach((child, index) => {
-                const htmlChild = child as HTMLElement;
-                if (htmlChild.tagName !== 'BUTTON') return;
-                const childCenter = htmlChild.offsetLeft + htmlChild.offsetWidth / 2;
-                const diff = Math.abs(containerCenter - childCenter);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    closestItem = items[index];
-                }
-            });
-
-            if (closestItem) {
-                const currentKey = itemKey(selectedItem);
-                const closestKey = itemKey(closestItem);
-                if (currentKey !== closestKey) {
-                    onSelect(closestItem);
-                }
-            }
-        }, 100);
-    };
-
-    return (
-        <div className={`space-y-1 lg:space-y-2 ${className}`}>
-            {label && (
-                <div className="flex justify-between items-center px-1">
-                    <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">{label}</span>
-                    {displayValue && (
-                        <span className="text-xs font-bold text-[#e6c190] bg-[#1a110b] px-3 py-1 rounded-md border border-[#3a2216] truncate max-w-[150px]">
-                            {displayValue}
-                        </span>
-                    )}
-                </div>
-            )}
-            <div className="relative group">
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#2a1b12] to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#2a1b12] to-transparent z-10 pointer-events-none" />
-                <div
-                    ref={containerRef}
-                    onScroll={handleScroll}
-                    className="flex h-full overflow-x-auto snap-x snap-mandatory gap-2 lg:gap-4 py-2 lg:py-4 px-[50%] no-scrollbar bg-[#1a110b]/30 rounded-xl border border-[#3a2216] shadow-inner items-center relative"
-                >
-                    {items.map((item) => {
-                        const key = itemKey(item);
-                        const isSelected = key === itemKey(selectedItem);
-                        return (
-                            <React.Fragment key={key}>
-                                {renderItem(item, isSelected)}
-                            </React.Fragment>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
-}
-
 const TabButton: React.FC<{
     active: boolean;
     onClick: () => void;
@@ -143,9 +42,9 @@ const TabButton: React.FC<{
 }> = ({ active, onClick, children }) => (
     <button
         onClick={onClick}
-        className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors ${active
-            ? 'text-[#e6c190] border-[#e6c190]'
-            : 'text-[#666] border-transparent hover:text-[#c29b6d]'
+        className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-500 rounded-lg ${active
+            ? 'bg-[#e6c190] text-[#1a110b] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_2px_rgba(255,255,255,0.5)] -translate-y-1'
+            : 'bg-[#1a110b] text-[#6b4e3d] shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] hover:text-[#c29b6d]'
             }`}
     >
         {children}
@@ -158,17 +57,18 @@ const Toggle: React.FC<{
     checked: boolean;
     onChange: (checked: boolean) => void;
 }> = ({ id, label, checked, onChange }) => (
-    <div className="flex items-center gap-2">
-        <input
-            type="checkbox"
-            id={id}
-            checked={checked}
-            onChange={(e) => onChange(e.target.checked)}
-            className="accent-[#e6c190]"
-        />
-        <label htmlFor={id} className="text-[#c29b6d] font-bold uppercase tracking-wider cursor-pointer select-none">
+    <div className="flex items-center justify-between bg-[#0a0705]/60 p-4 rounded-xl shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)]">
+        <label htmlFor={id} className="text-[10px] text-[#c29b6d] font-black uppercase tracking-[0.2em] cursor-pointer select-none">
             {label}
         </label>
+        <button
+            onClick={() => onChange(!checked)}
+            className={`w-14 h-7 rounded-full relative transition-all duration-500 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] ${checked ? 'bg-[#e6c190]' : 'bg-[#1a110b]'}`}
+        >
+            <div className={`absolute top-1 w-5 h-5 rounded-full transition-all duration-500 shadow-[0_4px_8px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center ${checked ? 'left-[32px] bg-[#1a110b]' : 'left-1 bg-[#c29b6d]'}`}>
+                <div className="w-1 h-2.5 bg-white/20 rounded-full" />
+            </div>
+        </button>
     </div>
 );
 
@@ -178,17 +78,27 @@ const Select: React.FC<{
     options: { value: string | number; label: string }[];
     onChange: (value: string) => void;
 }> = ({ label, value, options, onChange }) => (
-    <div className="flex flex-col gap-1">
-        <label className="text-[#888] font-bold uppercase tracking-wider">{label}</label>
-        <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="bg-[#2a1b12] text-[#e6c190] border border-[#3a2216] rounded p-2 outline-none focus:border-[#e6c190]/50 transition-colors"
-        >
-            {options.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-        </select>
+    <div className="flex flex-col gap-2.5">
+        <div className="flex items-center gap-2.5 ml-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] shadow-[0_0_8px_#ff4d00]" />
+            <label className="text-[9px] text-[#c29b6d] font-black uppercase tracking-[0.3em] opacity-80">{label}</label>
+        </div>
+        <div className="relative group">
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full bg-[#0a0705] text-[#e6c190] rounded-xl p-4 outline-none transition-all appearance-none text-xs font-bold shadow-[inset_0_6px_15px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.05)] cursor-pointer group-hover:bg-[#120c08]"
+            >
+                {options.map(opt => (
+                    <option key={opt.value} value={opt.value} className="bg-[#1a110b]">{opt.label}</option>
+                ))}
+            </select>
+            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#c29b6d] transition-transform group-hover:translate-y-[-40%]">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
     </div>
 );
 
@@ -221,7 +131,6 @@ const Controls: React.FC<ControlsProps> = ({
 }) => {
     const [activeTab, setActiveTab] = useState<'finder' | 'settings'>('finder');
     const [isExpanded, setIsExpanded] = useState(true);
-    const [showBass, setShowBass] = useState(false);
 
     const useFlats = preferFlats !== null
         ? preferFlats
@@ -240,63 +149,98 @@ const Controls: React.FC<ControlsProps> = ({
     };
 
     return (
-        <div className="relative flex flex-col h-full bg-[#2a1b12] border border-[#e6c190]/20 shadow-xl overflow-hidden rounded-xl font-mono">
-            {/* Decorative BG */}
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-10 pointer-events-none" />
+        <div className="relative flex flex-col h-full bg-[#2a1b12] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.4)] overflow-hidden rounded-[3rem] font-mono">
+            {/* Wood Texture Overlay - More realistic grain */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-40 pointer-events-none mix-blend-overlay" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/40 pointer-events-none" />
+
+            {/* Corner Screws - More 3D */}
+            <div className="absolute top-6 left-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2.5 bg-[#120c08] rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            </div>
+            <div className="absolute top-6 right-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2.5 bg-[#120c08] -rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            </div>
+            <div className="absolute bottom-6 left-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2.5 bg-[#120c08] -rotate-12 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            </div>
+            <div className="absolute bottom-6 right-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2.5 bg-[#120c08] rotate-[70deg] shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            </div>
+
+            {/* Speaker Grille Section - Recessed into the wood */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-[#120c08] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] overflow-hidden z-0">
+                <div className="absolute inset-0 opacity-50" style={{
+                    backgroundImage: 'radial-gradient(#c29b6d 1.5px, transparent 0)',
+                    backgroundSize: '7px 7px'
+                }} />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/40" />
+            </div>
 
             {/* Header & Tabs */}
-            <div className="flex flex-col z-10 border-b border-[#e6c190]/10 bg-[#1a110b]/90 backdrop-blur-sm">
-                <div className="flex items-center justify-between p-4 pb-2">
-                    <div>
-                        <h1 className="text-xl font-bold text-[#e6c190] uppercase tracking-tighter leading-none font-sans">
-                            AxeGrain
+            <div className="flex flex-col z-10 bg-transparent">
+                <div className="flex items-center justify-between p-10 pb-6">
+                    <div className="relative">
+                        <div className="absolute -inset-4 bg-[#e6c190] blur-xl opacity-5 rounded-full" />
+                        <h1 className="text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                            AXE<span className="text-[#c29b6d]">GRAIN</span>
                         </h1>
-                        <span className="text-[10px] text-[#c29b6d] tracking-widest uppercase">Chord Finder</span>
+                        <div className="flex items-center gap-3 mt-2">
+                            <div className="h-[1px] w-6 bg-gradient-to-r from-transparent to-[#c29b6d]/40" />
+                            <span className="text-[8px] text-[#c29b6d] font-black tracking-[0.4em] uppercase opacity-80">Precision Audio Gear</span>
+                            <div className="h-[1px] w-6 bg-gradient-to-l from-transparent to-[#c29b6d]/40" />
+                        </div>
                     </div>
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="lg:hidden p-2 text-[#c29b6d]"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
+                    <div className="flex items-center gap-6">
+                        <div className="flex flex-col items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#ff4d00] shadow-[0_0_12px_#ff4d00,inset_0_1px_2px_rgba(255,255,255,0.4)] animate-pulse" />
+                            <span className="text-[7px] text-[#c29b6d] font-black uppercase tracking-widest opacity-60">Signal</span>
+                        </div>
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="lg:hidden p-2.5 text-[#e6c190] bg-[#1a110b] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.1)] active:translate-y-0.5 transition-all"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex px-4 gap-6">
+                <div className="flex px-8 gap-4 mb-6">
                     <TabButton active={activeTab === 'finder'} onClick={() => { setActiveTab('finder'); setIsExpanded(true); }}>
-                        Finder
+                        Tuning
                     </TabButton>
                     <TabButton active={activeTab === 'settings'} onClick={() => { setActiveTab('settings'); setIsExpanded(true); }}>
-                        Settings
+                        Setup
                     </TabButton>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-4 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
+            <div className={`flex-1 overflow-y-auto custom-scrollbar px-6 lg:px-8 pb-8 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
                 {activeTab === 'settings' ? (
-                    <div className="space-y-4 animate-fade-in">
-                        <div className="bg-[#120c08] p-4 rounded-lg border border-[#e6c190]/10 grid grid-cols-1 gap-4 text-xs">
+                    <div className="space-y-8 animate-fade-in">
+                        <div className="bg-[#0a0705]/60 backdrop-blur-xl p-6 rounded-[2rem] shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-1 gap-6">
                             <Select
-                                label="Tuning"
+                                label="Instrument Tuning"
                                 value={tuning.name}
                                 options={TUNINGS.map(t => ({ value: t.name, label: t.name }))}
                                 onChange={(val) => onTuningChange(TUNINGS.find(t => t.name === val) || TUNINGS[0])}
                             />
                             <Select
-                                label="Capo"
+                                label="Capo Position"
                                 value={capo}
-                                options={CAPO_POSITIONS.map(p => ({ value: p, label: p === 0 ? '- None -' : `Fret ${p}` }))}
+                                options={CAPO_POSITIONS.map(p => ({ value: p, label: p === 0 ? 'Open Strings' : `Fret ${p}` }))}
                                 onChange={(val) => onCapoChange(Number(val))}
                             />
                             <Select
-                                label="Accidentals"
+                                label="Notation Style"
                                 value={preferFlats === null ? 'auto' : preferFlats ? 'flats' : 'sharps'}
                                 options={[
-                                    { value: 'auto', label: 'Auto (Smart)' },
-                                    { value: 'flats', label: 'Force Flats (\u266d)' },
-                                    { value: 'sharps', label: 'Force Sharps (\u266f)' }
+                                    { value: 'auto', label: 'Automatic' },
+                                    { value: 'flats', label: 'Flats (\u266d)' },
+                                    { value: 'sharps', label: 'Sharps (\u266f)' }
                                 ]}
                                 onChange={(val) => {
                                     if (val === 'auto') onPreferFlatsChange(null);
@@ -305,133 +249,71 @@ const Controls: React.FC<ControlsProps> = ({
                                 }}
                             />
                             <Select
-                                label="Scale Overlay"
+                                label="Scale Reference"
                                 value={selectedScale?.id || 'none'}
                                 options={SCALES.map(s => ({ value: s.id, label: s.name }))}
                                 onChange={(val) => onScaleChange(SCALES.find(s => s.id === val) || null)}
                             />
-                            <div className="pt-2 space-y-2">
-                                <Toggle id="lefty" label="Lefty Mode" checked={isLefty} onChange={onLeftyChange} />
-                                <Toggle id="showScale" label="Show All Chord Tones" checked={showAllNotes} onChange={onShowAllNotesChange} />
-                                <Toggle id="showIntervals" label="Show Intervals" checked={showIntervals} onChange={onShowIntervalsChange} />
+                            <div className="pt-4 grid grid-cols-1 gap-4">
+                                <Toggle id="lefty" label="Lefty Orientation" checked={isLefty} onChange={onLeftyChange} />
+                                <Toggle id="showScale" label="Full Chord Map" checked={showAllNotes} onChange={onShowAllNotesChange} />
+                                <Toggle id="showIntervals" label="Interval Labels" checked={showIntervals} onChange={onShowIntervalsChange} />
                             </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-2 lg:space-y-6 animate-fade-in h-full flex flex-col">
+                    <div className="space-y-6 lg:space-y-10 animate-fade-in h-full flex flex-col">
                         {/* Root Picker */}
-                        <ScrollablePicker
-                            label="Root"
+                        <HorizontalWheelRoller
+                            label="Root Frequency"
                             displayValue={getNoteName(getNoteValue(selectedRoot), useFlats)}
                             items={ROOTS}
                             selectedItem={selectedRoot}
                             onSelect={onRootChange}
                             itemKey={(item) => item}
-                            className="h-[84px] lg:h-[100px]"
-                            renderItem={(root, isSelected) => (
-                                <button
-                                    data-active={isSelected}
-                                    onClick={() => onRootChange(root)}
-                                    className={`
-                                        snap-center flex-shrink-0 w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center rounded-full transition-all duration-300 ease-out border relative
-                                        ${isSelected
-                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] scale-110 font-bold text-lg lg:text-xl z-10'
-                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-xs lg:text-sm opacity-50 hover:opacity-100'}
-                                    `}
-                                >
-                                    {getNoteName(getNoteValue(root), useFlats)}
-                                </button>
-                            )}
+                            getItemLabel={(root) => getNoteName(getNoteValue(root), useFlats)}
                         />
 
                         {/* Quality Picker */}
-                        <ScrollablePicker
-                            label="Quality"
+                        <HorizontalWheelRoller
+                            label="Chord Modulation"
                             displayValue={selectedQuality.name}
                             items={CHORD_TYPES}
                             selectedItem={selectedQuality}
                             onSelect={onQualityChange}
                             itemKey={(item) => item.id}
-                            className="h-[84px] lg:h-[100px]"
-                            renderItem={(q, isSelected) => (
-                                <button
-                                    data-active={isSelected}
-                                    onClick={() => onQualityChange(q)}
-                                    className={`
-                                        snap-center flex-shrink-0 px-3 py-1 lg:px-4 lg:py-2 rounded-lg transition-all duration-300 ease-out whitespace-nowrap border
-                                        ${isSelected
-                                            ? 'bg-[#e6c190] text-[#2a1b12] border-[#e6c190] shadow-[0_0_20px_rgba(230,193,144,0.3)] font-bold text-xs lg:text-sm scale-110 z-10'
-                                            : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-[10px] lg:text-xs opacity-50 hover:opacity-100'}
-                                    `}
-                                >
-                                    {q.suffix || q.name}
-                                </button>
-                            )}
+                            getItemLabel={(q) => q.suffix || q.name}
                         />
 
-                        {/* Slash Chord Toggle/Picker */}
-                        <div className="space-y-1 lg:space-y-2">
-                            <button
-                                onClick={() => {
-                                    if (showBass) {
-                                        onBassChange(selectedRoot);
-                                        setShowBass(false);
-                                    } else {
-                                        setShowBass(true);
-                                    }
-                                }}
-                                className={`w-full flex justify-between items-center px-3 py-2 lg:px-4 lg:py-3 rounded-xl border transition-all duration-300 ${showBass
-                                    ? 'bg-[#3a2216] border-[#e6c190] text-[#e6c190] shadow-lg'
-                                    : 'bg-[#1a110b]/40 border-[#3a2216] text-[#c29b6d] hover:bg-[#2a1b12]'
-                                    }`}
-                            >
-                                <span className="text-xs font-bold uppercase tracking-wide">Slash Bass / Inversion</span>
-                                <span className="text-sm font-mono font-bold opacity-80">
-                                    {selectedBass !== selectedRoot ? `/ ${getNoteName(getNoteValue(selectedBass), useFlats)}` : '/ Root'}
-                                </span>
-                            </button>
-
-                            {showBass && (
-                                <div className="animate-fade-in">
-                                    <ScrollablePicker
-                                        items={chordTones}
-                                        selectedItem={selectedBass}
-                                        onSelect={onBassChange}
-                                        itemKey={(item) => item}
-                                        className="h-[72px] lg:h-[88px]"
-                                        renderItem={(root, isSelected) => (
-                                            <button
-                                                data-active={isSelected}
-                                                onClick={() => onBassChange(root)}
-                                                className={`
-                                                    snap-center flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center rounded-full transition-all duration-300 ease-out border
-                                                    ${isSelected
-                                                        ? 'bg-[#c29b6d] text-[#1a110b] border-[#c29b6d] scale-110 font-bold text-base lg:text-lg z-10 shadow-[0_0_15px_rgba(194,155,109,0.4)]'
-                                                        : 'bg-[#2a1b12] text-[#555] border-transparent scale-90 text-[10px] lg:text-xs opacity-50 hover:opacity-100'}
-                                                `}
-                                            >
-                                                {getNoteName(getNoteValue(root), useFlats)}
-                                            </button>
-                                        )}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        {/* Bass Inversion Picker */}
+                        <HorizontalWheelRoller
+                            label="Bass Inversion"
+                            displayValue={selectedBass !== selectedRoot ? getNoteName(getNoteValue(selectedBass), useFlats) : 'ROOT POSITION'}
+                            items={chordTones}
+                            selectedItem={selectedBass}
+                            onSelect={onBassChange}
+                            itemKey={(item) => item}
+                            getItemLabel={(root) => getNoteName(getNoteValue(root), useFlats)}
+                        />
 
                         {/* Variations List */}
-                        <div className="flex-1 min-h-0 hidden lg:flex flex-col gap-1 lg:gap-3">
-                            <div className="flex justify-between items-baseline border-b border-[#3a2216] pb-2 mt-2 lg:mt-4">
-                                <span className="text-xs text-[#c29b6d] font-bold uppercase tracking-widest">
-                                    Variations ({variations.length})
-                                </span>
-                                <span className="text-[10px] text-[#6b4e3d] font-bold uppercase tracking-widest lg:hidden">
-                                    Swipe fretboard to flip
-                                </span>
+                        <div className="flex-1 min-h-0 hidden lg:flex flex-col gap-3">
+                            <div className="flex justify-between items-center pb-2 mt-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1 h-3 bg-[#ff4d00] rounded-full shadow-[0_0_8px_#ff4d00]" />
+                                    <span className="text-[9px] text-[#c29b6d] font-black uppercase tracking-[0.3em]">
+                                        Signal Variations
+                                    </span>
+                                </div>
+                                <div className="flex gap-1">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00] animate-pulse shadow-[0_0_4px_#ff4d00]" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#ff4d00]/20" />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-2 gap-2 overflow-y-auto flex-1 pr-1 custom-scrollbar pb-2 content-start">
+                            <div className="grid grid-cols-2 gap-3 overflow-y-auto flex-1 pr-2 custom-scrollbar pb-4 pt-2 content-start">
                                 {variations.length === 0 ? (
-                                    <div className="col-span-3 sm:col-span-4 lg:col-span-2 text-center text-[#666] text-xs py-8 italic">
-                                        No variations found.
+                                    <div className="col-span-2 text-center text-[#444] text-[9px] py-10 font-black uppercase tracking-[0.4em] italic bg-[#050302] rounded-2xl shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
+                                        No Signal Detected
                                     </div>
                                 ) : (
                                     variations.map((v, idx) => (
@@ -439,31 +321,29 @@ const Controls: React.FC<ControlsProps> = ({
                                             key={idx}
                                             onClick={() => onVariationSelect(idx)}
                                             className={`
-                                                text-left px-0 lg:px-4 rounded-lg border transition-all duration-200 group relative overflow-hidden flex items-center justify-center lg:flex lg:flex-col lg:justify-center h-12 lg:h-[4.5rem]
+                                                text-left px-4 py-3 rounded-xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-center h-16
                                                 ${variationIndex === idx
-                                                    ? 'bg-[#e6c190] border-[#e6c190] text-[#2a1b12] shadow-lg'
-                                                    : 'bg-[#1a110b]/40 border-[#3a2216] text-[#888] hover:border-[#6b4e3d] hover:bg-[#2a1b12]'}
+                                                    ? 'bg-[#e6c190] text-[#1a110b] shadow-[0_10px_25px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.4)] -translate-y-1 scale-[1.02]'
+                                                    : 'bg-[#050302] text-[#6b4e3d] shadow-[inset_0_4px_10px_rgba(0,0,0,0.8)] hover:bg-[#0a0705] hover:scale-[1.02]'
+                                                }
                                             `}
                                         >
-                                            {/* Mobile: Simple Number */}
-                                            <span className="lg:hidden text-sm font-bold">{idx + 1}</span>
-                                            {/* Desktop: Full Details */}
-                                            <div className="hidden lg:block w-full">
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${variationIndex === idx ? 'text-[#2a1b12]' : 'text-[#666] group-hover:text-[#c29b6d]'}`}>
-                                                        Var {idx + 1}
+                                            <div className="flex justify-between items-center mb-1 w-full">
+                                                <span className={`text-[8px] font-black uppercase tracking-[0.1em] ${variationIndex === idx ? 'text-[#1a110b]' : 'text-[#6b4e3d]'}`}>
+                                                    CH-{String(idx + 1).padStart(2, '0')}
+                                                </span>
+                                                {v.cagedShape && (
+                                                    <span className={`text-[7px] font-black px-1.5 py-0.5 rounded ${variationIndex === idx ? 'bg-[#1a110b]/10 text-[#1a110b]' : 'bg-[#c29b6d]/5 text-[#c29b6d]'}`}>
+                                                        {v.cagedShape}
                                                     </span>
-                                                    {v.cagedShape && (
-                                                        <span className={`text-[9px] font-bold px-1.5 rounded border ${variationIndex === idx ? 'border-[#2a1b12] text-[#2a1b12]' : 'border-[#c29b6d]/50 text-[#c29b6d]'}`}>
-                                                            {v.cagedShape}-Shape
-                                                        </span>
-                                                    )}
-                                                    {variationIndex === idx && !v.cagedShape && <span className="w-1.5 h-1.5 rounded-full bg-[#2a1b12]"></span>}
-                                                </div>
-                                                <div className={`font-mono text-sm tracking-widest ${variationIndex === idx ? 'font-bold' : ''}`}>
-                                                    {formatVariation(v)}
-                                                </div>
+                                                )}
                                             </div>
+                                            <div className={`font-mono text-xs tracking-[0.15em] ${variationIndex === idx ? 'font-black' : 'font-bold'}`}>
+                                                {formatVariation(v)}
+                                            </div>
+                                            {variationIndex === idx && (
+                                                <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#ff4d00] shadow-[-2px_0_12px_rgba(255,77,0,0.6)]" />
+                                            )}
                                         </button>
                                     ))
                                 )}
