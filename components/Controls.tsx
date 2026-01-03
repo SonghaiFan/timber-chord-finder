@@ -327,7 +327,7 @@ const Controls: React.FC<ControlsProps> = ({
                             selectedItem={selectedRoot}
                             onSelect={onRootChange}
                             itemKey={(item) => item}
-                            className="h-[96px] lg:h-[112px]"
+                            className="h-[84px] lg:h-[100px]"
                             renderItem={(root, isSelected) => (
                                 <button
                                     data-active={isSelected}
