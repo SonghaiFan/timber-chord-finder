@@ -85,7 +85,7 @@ const Fretboard: React.FC<FretboardProps> = ({
   };
 
   // Config for Vertical Fretboard
-  const headstockHeight = 80;
+  const headstockHeight = 100;
   const fretSpacing = 50;
   const minFrets = 22;
 
@@ -333,7 +333,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                 className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none"
                 style={{
                   width: `${boardWidth}px`,
-                  height: `${boardHeight + headstockHeight + 200}px`,
+                  height: `${boardHeight + headstockHeight + headstockHeight}px`,
                   background: 'linear-gradient(90deg, #3a2216 0%, #5a3a29 50%, #3a2216 100%)'
                 }}
               >
@@ -543,8 +543,9 @@ const Fretboard: React.FC<FretboardProps> = ({
                 {stringNames.map((_, i) => (
                   <div
                     key={`string-${i}`}
-                    className="absolute top-[80px] bottom-0 shadow-[2px_0_4px_rgba(0,0,0,0.6)] z-20 pointer-events-none"
+                    className="absolute bottom-0 shadow-[2px_0_4px_rgba(0,0,0,0.6)] z-20 pointer-events-none"
                     style={{
+                      top: `${headstockHeight}px`,
                       left: `${getStringX(i)}px`,
                       width: i < 3 ? '3px' : '1px',
                       background: i < 3
@@ -681,7 +682,7 @@ const Fretboard: React.FC<FretboardProps> = ({
                 })}
 
                 {/* Bottom Fade-out to blend the neck into the cavity background */}
-                <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#1a110b] to-transparent z-30 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-[100px] bg-gradient-to-t from-[#1a110b] to-transparent z-30 pointer-events-none" />
               </div>
             </div>
           </div>
