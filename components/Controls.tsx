@@ -149,22 +149,22 @@ const Controls: React.FC<ControlsProps> = ({
     };
 
     return (
-        <div className="relative flex flex-col h-full bg-[#2a1b12] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.4)] overflow-hidden rounded-3xl lg:rounded-[3rem] font-mono">
+        <div className="relative flex flex-col h-full bg-[#2a1b12] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.4)] overflow-hidden rounded-3xl font-mono">
             {/* Wood Texture Overlay - More realistic grain */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-40 pointer-events-none mix-blend-overlay" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/40 pointer-events-none" />
 
             {/* Corner Screws - More 3D */}
-            <div className="absolute top-3 left-3 lg:top-4 lg:left-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+            <div className="absolute top-4 left-4 lg:top-6 lg:left-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
                 <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute top-3 right-3 lg:top-4 lg:right-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+            <div className="absolute top-4 right-4 lg:top-6 lg:right-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
                 <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] -rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute bottom-3 left-3 lg:bottom-4 lg:left-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+            <div className="absolute bottom-4 left-4 lg:bottom-6 lg:left-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
                 <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] -rotate-12 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute bottom-3 right-3 lg:bottom-4 lg:right-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+            <div className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
                 <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] rotate-[70deg] shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
 
@@ -260,6 +260,8 @@ const Controls: React.FC<ControlsProps> = ({
                                 <Toggle id="showIntervals" label="Interval Labels" checked={showIntervals} onChange={onShowIntervalsChange} />
                             </div>
                         </div>
+                        {/* Bottom Spacer to avoid screw overlap */}
+                        <div className="h-20 lg:h-32 flex-shrink-0 pointer-events-none" />
                     </div>
                 ) : (
                     <div className="space-y-4 lg:space-y-10 animate-fade-in h-full flex flex-col">
@@ -349,6 +351,8 @@ const Controls: React.FC<ControlsProps> = ({
                                 )}
                             </div>
                         </div>
+                        {/* Bottom Spacer to avoid screw overlap */}
+                        <div className="h-20 lg:h-32 flex-shrink-0 pointer-events-none" />
                     </div>
                 )}
             </div>

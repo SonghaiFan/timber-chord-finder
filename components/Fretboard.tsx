@@ -314,19 +314,20 @@ const Fretboard: React.FC<FretboardProps> = ({
         <div
           ref={scrollContainerRef}
           style={{ touchAction: 'pan-y' }}
-          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-2xl lg:rounded-[2rem] shadow-[inset_0_20px_40px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] relative"
+          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#1a110b] rounded-2xl lg:rounded-[2rem] shadow-[inset_0_20px_40px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] relative"
         >
+          {/* Wood Texture Overlay for Fretboard Cavity */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
+          
           {/* Depth Overlay & Bezel Effect */}
           <div className="absolute inset-0 pointer-events-none z-40 rounded-2xl lg:rounded-[2rem] shadow-[inset_0_2px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)]" />
           <div className="absolute inset-0 pointer-events-none z-40 bg-gradient-to-b from-black/40 via-transparent to-black/20 opacity-60" />
-
+          
           {/* Side Vignettes for depth */}
           <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/40 to-transparent pointer-events-none z-40" />
           <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/40 to-transparent pointer-events-none z-40" />
 
-          <div className="flex justify-center pb-24 min-h-full">
-
-            {/* The Guitar Neck */}
+          <div className="flex justify-center pb-32 lg:pb-40 min-h-full relative z-10">
             <div
               className="relative shadow-[0_0_50px_rgba(0,0,0,0.8)] select-none rounded-b-lg"
               style={{
