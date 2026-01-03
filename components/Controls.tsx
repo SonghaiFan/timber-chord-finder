@@ -42,7 +42,7 @@ const TabButton: React.FC<{
 }> = ({ active, onClick, children }) => (
     <button
         onClick={onClick}
-        className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-500 rounded-lg ${active
+        className={`px-4 lg:px-6 py-2 lg:py-2.5 text-[9px] lg:text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-500 rounded-lg ${active
             ? 'bg-[#e6c190] text-[#1a110b] shadow-[0_10px_20px_rgba(0,0,0,0.4),inset_0_1px_2px_rgba(255,255,255,0.5)] -translate-y-1'
             : 'bg-[#1a110b] text-[#6b4e3d] shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] hover:text-[#c29b6d]'
             }`}
@@ -149,27 +149,27 @@ const Controls: React.FC<ControlsProps> = ({
     };
 
     return (
-        <div className="relative flex flex-col h-full bg-[#2a1b12] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.4)] overflow-hidden rounded-[3rem] font-mono">
+        <div className="relative flex flex-col h-full bg-[#2a1b12] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.4)] overflow-hidden rounded-3xl lg:rounded-[3rem] font-mono">
             {/* Wood Texture Overlay - More realistic grain */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-40 pointer-events-none mix-blend-overlay" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/40 pointer-events-none" />
 
             {/* Corner Screws - More 3D */}
-            <div className="absolute top-6 left-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2.5 bg-[#120c08] rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            <div className="absolute top-3 left-3 lg:top-4 lg:left-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute top-6 right-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2.5 bg-[#120c08] -rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            <div className="absolute top-3 right-3 lg:top-4 lg:right-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] -rotate-45 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute bottom-6 left-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2.5 bg-[#120c08] -rotate-12 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            <div className="absolute bottom-3 left-3 lg:bottom-4 lg:left-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] -rotate-12 shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
-            <div className="absolute bottom-6 right-6 w-4 h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
-                <div className="w-[1px] h-2.5 bg-[#120c08] rotate-[70deg] shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
+            <div className="absolute bottom-3 right-3 lg:bottom-4 lg:right-4 w-3 h-3 lg:w-4 lg:h-4 rounded-full bg-gradient-to-b from-[#3a2216] to-[#1a110b] shadow-[0_2px_4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center z-20">
+                <div className="w-[1px] h-2 lg:h-2.5 bg-[#120c08] rotate-[70deg] shadow-[1px_0_1px_rgba(255,255,255,0.05)]" />
             </div>
 
             {/* Speaker Grille Section - Recessed into the wood */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-[#120c08] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] overflow-hidden z-0">
+            <div className="absolute top-0 left-0 right-0 h-24 lg:h-32 bg-[#120c08] shadow-[inset_0_-10px_20px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.05)] overflow-hidden z-0">
                 <div className="absolute inset-0 opacity-50" style={{
                     backgroundImage: 'radial-gradient(#c29b6d 1.5px, transparent 0)',
                     backgroundSize: '7px 7px'
@@ -179,22 +179,22 @@ const Controls: React.FC<ControlsProps> = ({
 
             {/* Header & Tabs */}
             <div className="flex flex-col z-10 bg-transparent">
-                <div className="flex items-center justify-between p-10 pb-6">
+                <div className="flex items-center justify-between p-6 lg:p-10 pb-4 lg:pb-6">
                     <div className="relative">
                         <div className="absolute -inset-4 bg-[#e6c190] blur-xl opacity-5 rounded-full" />
-                        <h1 className="text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                        <h1 className="text-2xl lg:text-3xl font-black text-[#e6c190] uppercase tracking-[-0.08em] leading-none font-serif italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                             AXE<span className="text-[#c29b6d]">GRAIN</span>
                         </h1>
-                        <div className="flex items-center gap-3 mt-2">
-                            <div className="h-[1px] w-6 bg-gradient-to-r from-transparent to-[#c29b6d]/40" />
-                            <span className="text-[8px] text-[#c29b6d] font-black tracking-[0.4em] uppercase opacity-80">Precision Audio Gear</span>
-                            <div className="h-[1px] w-6 bg-gradient-to-l from-transparent to-[#c29b6d]/40" />
+                        <div className="flex items-center gap-3 mt-1.5 lg:mt-2">
+                            <div className="h-[1px] w-4 lg:w-6 bg-gradient-to-r from-transparent to-[#c29b6d]/40" />
+                            <span className="text-[7px] lg:text-[8px] text-[#c29b6d] font-black tracking-[0.4em] uppercase opacity-80">Precision Audio Gear</span>
+                            <div className="h-[1px] w-4 lg:w-6 bg-gradient-to-l from-transparent to-[#c29b6d]/40" />
                         </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#ff4d00] shadow-[0_0_12px_#ff4d00,inset_0_1px_2px_rgba(255,255,255,0.4)] animate-pulse" />
-                            <span className="text-[7px] text-[#c29b6d] font-black uppercase tracking-widest opacity-60">Signal</span>
+                    <div className="flex items-center gap-4 lg:gap-6">
+                        <div className="flex flex-col items-center gap-1 lg:gap-1.5">
+                            <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 rounded-full bg-[#ff4d00] shadow-[0_0_12px_#ff4d00,inset_0_1px_2px_rgba(255,255,255,0.4)] animate-pulse" />
+                            <span className="text-[6px] lg:text-[7px] text-[#c29b6d] font-black uppercase tracking-widest opacity-60">Signal</span>
                         </div>
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
@@ -218,10 +218,10 @@ const Controls: React.FC<ControlsProps> = ({
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar px-6 lg:px-8 pb-8 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
+            <div className={`flex-1 overflow-y-auto custom-scrollbar px-4 lg:px-8 pb-12 lg:pb-16 z-10 ${isExpanded ? 'block' : 'hidden lg:block'}`}>
                 {activeTab === 'settings' ? (
-                    <div className="space-y-8 animate-fade-in">
-                        <div className="bg-[#0a0705]/60 backdrop-blur-xl p-6 rounded-[2rem] shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-1 gap-6">
+                    <div className="space-y-6 lg:space-y-8 animate-fade-in">
+                        <div className="bg-[#0a0705]/60 backdrop-blur-xl p-4 lg:p-6 rounded-2xl lg:rounded-[2rem] shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] grid grid-cols-1 gap-4 lg:gap-6">
                             <Select
                                 label="Instrument Tuning"
                                 value={tuning.name}
@@ -262,7 +262,7 @@ const Controls: React.FC<ControlsProps> = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-6 lg:space-y-10 animate-fade-in h-full flex flex-col">
+                    <div className="space-y-4 lg:space-y-10 animate-fade-in h-full flex flex-col">
                         {/* Root Picker */}
                         <HorizontalWheelRoller
                             label="Root Frequency"

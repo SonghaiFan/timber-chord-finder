@@ -19,20 +19,18 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(10, 7, 5, 0.4);
-  border-radius: 10px;
-  margin: 10px;
+  background: transparent;
+  margin: 15px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #3a2216;
+  background: rgba(58, 34, 22, 0.6);
   border-radius: 10px;
-  border: 1px solid rgba(230, 193, 144, 0.1);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #c29b6d;
+  background: rgba(194, 155, 109, 0.4);
 }
 
 .no-scrollbar::-webkit-scrollbar {

@@ -233,33 +233,46 @@ const Fretboard: React.FC<FretboardProps> = ({
   return (
     <div className="relative flex flex-col h-full w-full max-w-md mx-auto lg:max-w-none">
 
-      {/* Mobile Info Bar */}
-      <div className="lg:hidden mb-2">
-        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl border border-[#3a2216] bg-[#1a110b]/80 backdrop-blur-sm shadow-lg">
-          <div className="flex items-center gap-3">
+      {/* Chord Info Bar - Skeuomorphic "Display" (Unified for Mobile & Desktop) */}
+      <div className="mb-3 lg:mb-6">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 lg:px-6 lg:py-5 rounded-2xl lg:rounded-[2rem] bg-[#0a0705] shadow-[inset_0_4px_12px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.05)] relative overflow-hidden">
+          {/* Glass reflection */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-10 pointer-events-none" />
+
+          <div className="flex items-center gap-4 lg:gap-6 relative z-10">
             <button
               onClick={() => variation && playChord(variation.frets, tuning.offsets, capo)}
-              className="w-10 h-10 rounded-full bg-[#e6c190] text-[#2a1b12] flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+              className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-[#e6c190] text-[#1a110b] flex items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.4)] active:scale-95 active:translate-y-0.5 transition-all group/play"
               aria-label="Play Chord"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 lg:h-9 lg:w-9 transition-transform group-hover/play:scale-110" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </button>
             <div className="flex flex-col">
-              <span className="text-lg font-bold leading-tight text-[#e6c190]">{chordName}</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#c29b6d]">{formula}</span>
+              <span className="text-xl lg:text-3xl font-black leading-tight text-[#e6c190] tracking-tight uppercase font-serif italic">{chordName}</span>
+              <div className="flex items-center gap-2 lg:gap-3">
+                <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-[#ff4d00] shadow-[0_0_6px_#ff4d00]" />
+                <span className="text-[9px] lg:text-[11px] font-mono font-black uppercase tracking-[0.2em] text-[#c29b6d] opacity-80">{formula}</span>
+                {aliases && (
+                  <span className="hidden lg:inline text-[10px] text-[#c29b6d]/40 italic border-l border-[#c29b6d]/20 pl-3">
+                    {aliases}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1.5 lg:gap-2 relative z-10">
             {capo > 0 && (
-              <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-[#2a1b12] text-[#e6c190] border border-[#e6c190]/40 uppercase tracking-wider shadow-sm">
-                Capo {capo}
+              <span className="text-[8px] lg:text-[10px] font-black px-2 py-0.5 lg:px-3 lg:py-1 rounded bg-[#ff4d00]/10 text-[#ff4d00] border border-[#ff4d00]/20 uppercase tracking-widest">
+                CAPO {capo}
               </span>
             )}
-            <span className="text-[11px] text-[#c29b6d] font-bold">
-              Var {Math.min(variationIndex + 1, totalVariations)}/{Math.max(totalVariations, 1)}
-            </span>
+            <div className="bg-[#1a110b] px-2 py-1 lg:px-4 lg:py-2 rounded-lg lg:rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]">
+              <span className="text-[10px] lg:text-xs text-[#c29b6d] font-black tracking-tighter">
+                VAR <span className="text-[#e6c190]">{Math.min(variationIndex + 1, totalVariations)}</span><span className="opacity-30 mx-0.5">/</span>{Math.max(totalVariations, 1)}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -270,54 +283,6 @@ const Fretboard: React.FC<FretboardProps> = ({
           Swipe for shapes
         </div>
       )}
-
-      {/* Info Panel */}
-      <div className="hidden lg:flex mb-2 p-3 bg-[#fdfbf7] border-2 border-[#1a110b] rounded-lg shadow-lg flex-col gap-2 text-[#1a110b] relative overflow-hidden flex-shrink-0 z-20">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] pointer-events-none" />
-
-        <div className="relative z-10 flex justify-between items-start">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => variation && playChord(variation.frets, tuning.offsets, capo)}
-              className="w-12 h-12 rounded-full bg-[#2a1b12] text-[#e6c190] flex items-center justify-center shadow-md hover:bg-[#3a2216] hover:scale-105 active:scale-95 transition-all group/play"
-              aria-label="Play Chord"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 transition-transform group-hover/play:translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </button>
-            <div>
-              <h2 className="text-3xl font-bold leading-none text-[#2a1b12] tracking-tight">{chordName}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="text-xs font-mono text-[#666] font-bold">{formula}</div>
-                {aliases && (
-                  <div className="text-[10px] text-[#888] italic border-l border-[#ddd] pl-2">
-                    {aliases}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            {capo > 0 && (
-              <div className="bg-[#2a1b12] text-[#e6c190] px-3 py-1 rounded text-xs font-bold uppercase tracking-wider shadow-sm border border-[#e6c190]/30">
-                Capo {capo}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="relative z-10 flex gap-2 text-xs border-t border-[#ddd] pt-1">
-          <span className="font-bold text-[#666]">Notes:</span>
-          <span className="font-mono text-[#2a1b12]">
-            {variation?.frets.map((f, i) => {
-              if (f < 0) return null;
-              const pitch = tuning.offsets[i] + capo + f;
-              return getNoteName(pitch, useFlats);
-            }).filter(Boolean).join(', ')}
-          </span>
-        </div>
-      </div>
 
       {/* Fretboard Container with Arrows */}
       <div className="flex-1 relative min-h-0 group/board">
@@ -349,8 +314,16 @@ const Fretboard: React.FC<FretboardProps> = ({
         <div
           ref={scrollContainerRef}
           style={{ touchAction: 'pan-y' }}
-          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-xl  shadow-2xl relative"
+          className="h-full w-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0f0a06] rounded-2xl lg:rounded-[2rem] shadow-[inset_0_20px_40px_rgba(0,0,0,0.8),0_1px_0_rgba(255,255,255,0.05)] relative"
         >
+          {/* Depth Overlay & Bezel Effect */}
+          <div className="absolute inset-0 pointer-events-none z-40 rounded-2xl lg:rounded-[2rem] shadow-[inset_0_2px_10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)]" />
+          <div className="absolute inset-0 pointer-events-none z-40 bg-gradient-to-b from-black/40 via-transparent to-black/20 opacity-60" />
+
+          {/* Side Vignettes for depth */}
+          <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/40 to-transparent pointer-events-none z-40" />
+          <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/40 to-transparent pointer-events-none z-40" />
+
           <div className="flex justify-center pb-24 min-h-full">
 
             {/* The Guitar Neck */}

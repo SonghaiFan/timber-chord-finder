@@ -93,12 +93,12 @@ function HorizontalWheelRoller<T>({
     };
 
     return (
-        <div className={`flex flex-col gap-1.5 ${className}`}>
+        <div className={`flex flex-col gap-1 lg:gap-1.5 ${className}`}>
             {label && (
                 <div className="flex justify-between items-center px-1">
-                    <span className="text-[10px] text-[#c29b6d] font-black uppercase tracking-[0.2em]">{label}</span>
+                    <span className="text-[9px] lg:text-[10px] text-[#c29b6d] font-black uppercase tracking-[0.2em]">{label}</span>
                     {displayValue && (
-                        <span className="text-[10px] font-bold text-[#e6c190] bg-[#0a0705] px-3 py-0.5 rounded-full border border-[#3a2216] shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
+                        <span className="text-[9px] lg:text-[10px] font-bold text-[#e6c190] bg-[#0a0705] px-2 lg:px-3 py-0.5 rounded-full border border-[#3a2216] shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]">
                             {displayValue}
                         </span>
                     )}
@@ -106,21 +106,7 @@ function HorizontalWheelRoller<T>({
             )}
 
             <div className="relative group h-16 lg:h-20">
-                {/* The "Pointer" - a downward triangle with physical depth */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
-                    <div
-                        className="w-8 h-5 bg-[#1a110b] shadow-[0_4px_8px_rgba(0,0,0,0.8)]"
-                        style={{
-                            clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                        }}
-                    />
-                    <div
-                        className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-3.5 bg-[#ff4d00] opacity-90 blur-[0.5px]"
-                        style={{
-                            clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-                        }}
-                    />
-                </div>
+
 
                 {/* Glass Cover Effect - Borderless, recessed into wood */}
                 <div className="absolute inset-0 rounded-2xl shadow-[inset_0_8px_20px_rgba(0,0,0,0.9),0_1px_0_rgba(255,255,255,0.05)] pointer-events-none z-30 overflow-hidden">

@@ -51,7 +51,7 @@ const App: React.FC = () => {
   const displayName = `${rootName} ${quality.name}${bass !== root ? ` / ${bassName}` : ''}`;
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#120c08] flex items-center justify-center p-2 lg:p-8 font-sans text-[#e6c190] overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-[#120c08] flex items-center justify-center p-3 lg:p-8 font-sans text-[#e6c190] overflow-hidden">
 
       <WoodGrain />
 
@@ -61,11 +61,11 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-6xl h-full flex flex-col lg:flex-row gap-2 lg:gap-8">
+      <div className="relative z-10 w-full max-w-6xl h-full flex flex-col lg:flex-row gap-3 lg:gap-8">
 
         {/* Left Column: Controls */}
-        {/* Mobile: Constrained height to allow fretboard to show. Desktop: Full height. */}
-        <div className="flex-shrink-0 w-full lg:w-[360px] max-h-[45vh] lg:max-h-full lg:h-full flex flex-col min-h-0 transition-all duration-300">
+        {/* Mobile: Dynamic height based on expansion. Desktop: Full height. */}
+        <div className="flex-shrink-0 w-full lg:w-[360px] max-h-[50vh] lg:max-h-full lg:h-full flex flex-col min-h-0 transition-all duration-500 ease-in-out">
           <Controls
             selectedRoot={root}
             selectedQuality={quality}
