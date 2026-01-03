@@ -238,7 +238,7 @@ const Fretboard: React.FC<FretboardProps> = ({
               </svg>
             </button>
             <div className="flex flex-col">
-              <span className="text-xl lg:text-3xl font-black leading-tight text-[#e6c190] tracking-tight uppercase font-serif italic">{chordName}</span>
+              <span className="lg:text-xl font-black leading-tight text-[#e6c190] tracking-tight uppercase font-serif italic">{chordName}</span>
               <div className="flex items-center gap-2 lg:gap-3">
                 <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-[#ff4d00] shadow-[0_0_6px_#ff4d00]" />
                 <span className="text-[9px] lg:text-[11px] font-mono font-black uppercase tracking-[0.2em] text-[#c29b6d] opacity-80">{formula}</span>
